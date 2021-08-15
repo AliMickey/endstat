@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 80
 
-ENTRYPOINT ["./gunicorn.sh"]
+ENTRYPOINT ["sh","./gunicorn.sh"]
