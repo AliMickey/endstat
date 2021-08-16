@@ -11,27 +11,29 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
-        username = request.form['username']
+        first_name = request.form['first_name']
+        email = request.form['email']
         password = request.form['password']
         db = get_db()
         error = None
 
         tempUserID = db.execute(
-            'SELECT id FROM users WHERE username = ?', (username,)
+            'SELECT id FROM users WHERE email = ?', (email,)
         ).fetchone() 
-
-        if not username:
+        if not first_name:
+            error = 'First name is required.'
+        elif not email:
             error = 'Username is required.'
         elif not password:
             error = 'Password is required.'
         elif tempUserID is not None:
-            error = 'User {} is already registered.'.format(username)
+            error = 'User {} is already registered.'.format(email)
 
         if error is None:
             # Create user
             db.execute(
-                'INSERT INTO users (username, password) VALUES (?, ?)',
-                (username, generate_password_hash(password))
+                'INSERT INTO users (first_name, email, password) VALUES (?, ?, ?)',
+                (first_name, email, generate_password_hash(password))
             )
             db.commit()
             return redirect(url_for('auth.login'))
@@ -44,16 +46,16 @@ def register():
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
         db = get_db()
         error = None
         user = db.execute(
-            'SELECT * FROM users WHERE username = ?', (username,)
+            'SELECT * FROM users WHERE email = ?', (email,)
         ).fetchone()
 
         if user is None:
-            error = 'Incorrect username.'
+            error = 'Incorrect email.'
         elif not check_password_hash(user['password'], password):
             error = 'Incorrect password.'
 
@@ -61,10 +63,16 @@ def login():
             session.clear()
             session['user_id'] = user['id']
             return redirect(url_for('index'))
-
         flash(error)
 
     return render_template('auth/login.html')
+
+
+@bp.route('/forgot-password', methods=('GET', 'POST'))
+def forgotPassword():
+    print("forgot password")
+
+    #return render_template('auth/forgot-password.html')
 
 
 @bp.before_app_request

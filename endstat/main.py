@@ -6,11 +6,21 @@ from endstat.auth import login_required
 
 bp = Blueprint('main', __name__)
 
-#Index
+#Main views
 @bp.route('/')
 def index():
     return render_template('index.html')
 
-@bp.route('/table')
-def table():
-    return render_template('table.html')
+@bp.route('/websites')
+def websiteList():
+    return render_template('websites.html')
+
+
+# Error views
+@bp.app_errorhandler(404)
+def page_not_found(e):
+    return render_template('error/404.html'), 404
+
+@bp.app_errorhandler(403)
+def authorisation_error(e):
+    return render_template('error/403.html'), 403
