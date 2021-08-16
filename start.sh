@@ -1,5 +1,5 @@
 #!/bin/bash
-if [$(docker inspect --format="{{.State.Running}}"]; then
+if [$(docker inspect --format="{{.State.Running}}")]; then
     echo "Container is running"
     docker stop endstat
     docker rm endstat
