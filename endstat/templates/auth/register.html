@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% set active_page = "register" %}
 {% block title %}End Stat - Register{% endblock %}
 
 {% block content %}  
@@ -21,7 +22,12 @@
                                 <div class="col-sm-6"><input class="form-control form-control-user" type="password" id="exampleRepeatPasswordInput" placeholder="Repeat Password" name="password_repeat" required></div>
                             </div><button class="btn btn-primary d-block btn-user w-100" type="submit">Register Account</button>
                             <hr>
-                            <hr>
+                            {% if error %}
+                                <div class="text-center">        
+                                    <p class="large">{{ error }}</p>
+                                    <hr>   
+                                </div>  
+                            {% endif %}
                         </form>
                         <div class="text-center"><a class="small" href="{{ url_for('auth.login') }}">Already have an account? Login!</a></div>
                     </div>
@@ -29,9 +35,13 @@
             </div>
         </div>
     </div>
+    <footer class="bg-white sticky-footer">
+        <div class="container my-auto">
+            <div class="text-center my-auto copyright"><span>Copyright© Endstat 2021</span></div>
+        </div>
+    </footer>
 </div>
 {% endblock %}
 
 {% block bodyScripts %}   
-    <script src="{{ url_for('static', filename='assets/js/theme.js') }}"></script>
 {% endblock %} 

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% set active_page = "login" %}
 {% block title %}End Stat - Log In{% endblock %}
 
 {% block headScripts %}
@@ -25,8 +26,13 @@
                                         </div>
                                     </div><button class="btn btn-primary d-block btn-user w-100" type="submit">Login</button>
                                     <hr>
-                                    <hr>
                                 </form>
+                                {% if error %}
+                                    <div class="text-center">        
+                                        <p class="large">{{ error }}</p>
+                                        <hr>   
+                                    </div>  
+                                {% endif %}
                                 <div class="text-center"><a class="small" href="{{ url_for('auth.forgotPassword') }}">Forgot Password?</a></div>
                                 <div class="text-center"><a class="small" href="{{ url_for('auth.register') }}">Create an Account!</a></div>
                             </div>
@@ -36,9 +42,13 @@
             </div>
         </div>
     </div>
+    <footer class="bg-white sticky-footer">
+        <div class="container my-auto">
+            <div class="text-center my-auto copyright"><span>Copyright© Endstat 2021</span></div>
+        </div>
+    </footer>
 </div>
 {% endblock %}
 
 {% block bodyScripts %}   
-    <script src="{{ url_for('static', filename='assets/js/theme.js') }}"></script>
 {% endblock %} 

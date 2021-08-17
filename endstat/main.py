@@ -11,7 +11,13 @@ bp = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
+@bp.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+
 @bp.route('/websites')
+@login_required
 def websiteList():
     return render_template('websites.html')
 
