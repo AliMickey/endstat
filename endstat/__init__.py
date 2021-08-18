@@ -8,6 +8,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'endstat.sqlite'),
+        ENVFILE=os.path.join(app.root_path, '.env'),
     )
 
     if test_config is None:
@@ -32,9 +33,5 @@ def create_app(test_config=None):
     from . import main
     app.register_blueprint(main.bp)
     app.add_url_rule('/', endpoint='index')
-
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
 
     return app
