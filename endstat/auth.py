@@ -8,6 +8,7 @@ from endstat.notifications import send_email
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     error = None
@@ -17,8 +18,8 @@ def register():
         password = request.form['password']
         password_repeat = request.form['password_repeat']
         db = get_db()
-    
         tempUserID = db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone() 
+
         if not first_name:
             error = 'First name is required.'
         elif not email:
@@ -34,8 +35,7 @@ def register():
             # Create user
             db.execute(
                 'INSERT INTO users (first_name, email, password) VALUES (?, ?, ?)',
-                (first_name, email, generate_password_hash(password))
-            )
+                (first_name, email, generate_password_hash(password)))
             db.commit()
             send_email(email, "Welcome to End Stat", "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
             return redirect(url_for('auth.login'))
@@ -58,7 +58,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('index'))
+            return redirect(url_for('main.dashboard'))
 
     return render_template('auth/login.html', error=error)
 

@@ -21,6 +21,11 @@ def dashboard():
 def websiteList():
     return render_template('websites.html')
 
+@bp.route('/settings')
+@login_required
+def settings():
+    return render_template('settings.html')
+
 
 # Error views
 @bp.app_errorhandler(404)

@@ -1,14 +1,14 @@
 import os, requests
 from dotenv import load_dotenv
-load_dotenv('../env')
+load_dotenv('../.env')
 
-mailgunAPIkey = os.environ.get('mailgunAPIkey')
+MAILGUN_API = os.environ.get('MAILGUN_API')
 
 def send_email(recipient, subject, message):
 	return requests.post(
 		"https://api.mailgun.net/v3/endstat.com/messages",
-		auth=("api", mailgunAPIkey),
+		auth=("api", MAILGUN_API),
 		data={"from": "End Stat <info@endstat.com>",
-			"to": [recipient],
+			"to": recipient,
 			"subject": subject,
 			"text": message})
