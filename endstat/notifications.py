@@ -1,6 +1,6 @@
 import os, requests
 from dotenv import load_dotenv
-load_dotenv(os.path.join(endstat.instance_path, '.env')
+load_dotenv('../.env')
 
 MAILGUN_API = os.environ.get('MAILGUN_API')
 
