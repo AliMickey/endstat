@@ -4,7 +4,8 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from endstat.db import get_db
-from endstat.notifications import send_email
+import endstat.notifications as notif
+import uuid, datetime
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -29,7 +30,7 @@ def register():
         elif password != password_repeat:
             error = 'Passwords do not match.'
         elif tempUserID is not None:
-            error = 'User "{}" is already registered.'.format(email)
+            error = '"{}" is already registered.'.format(email)
 
         if error is None:
             # Create user
@@ -37,7 +38,7 @@ def register():
                 'INSERT INTO users (first_name, email, password) VALUES (?, ?, ?)',
                 (first_name, email, generate_password_hash(password)))
             db.commit()
-            send_email(email, "Welcome to End Stat", "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
+            notif.send_email(email, "Welcome to End Stat", "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
             return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', error=error)
@@ -65,9 +66,81 @@ def login():
 
 @bp.route('/forgot-password', methods=('GET', 'POST'))
 def forgotPassword():
-    print("forgot password")
+    error = None
+    if request.method == 'POST':
+        email = request.form['email']
+        db = get_db()   
+        # Get user id for email if exists
+        user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
 
-    #return render_template('auth/forgot-password.html')
+        if user is not None:
+            userID = user['id']
+            # Check if user has used key or has already requested for a password reset within last 24 hours
+            resetPassDetails = db.execute('SELECT reset_key, datetime(date_time), activated FROM resetPass WHERE user_id = ?', (userID,)).fetchone()
+            # Send the same key again
+            if (resetPassDetails and checkPasswordResetValidity(resetPassDetails[1], resetPassDetails['activated'])):
+                resetKey = resetPassDetails['reset_key']
+
+            else:
+                # Generate and send a new key
+                resetKey = uuid.uuid4()
+                db.execute('INSERT INTO resetPass (reset_key, user_id, date_time, activated) VALUES (?, ?, ?, ?) ', 
+                    (str(resetKey), userID, datetime.datetime.now(), False))
+                db.commit()
+                print("new key generated")
+
+            notif.send_email(email, "Password Reset for EndStat", f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
+        
+        error = "If your email exists in our system, you will receive an email soon with instructions. Check your spam if you do not see it."
+
+    return render_template('auth/forgot-password.html', error=error)
+
+
+@bp.route('/reset-password/<string:resetKey>', methods=('GET', 'POST'))
+def resetPassword(resetKey):
+    error = None
+    db = get_db()          
+    resetPassDetails = db.execute('SELECT user_id, datetime(date_time), activated FROM resetPass WHERE reset_key = ?', (resetKey,)).fetchone()
+    if request.method == 'GET':
+        if (resetPassDetails and checkPasswordResetValidity(resetPassDetails[1], resetPassDetails['activated'])): 
+            return render_template('auth/reset-password.html', resetKey=resetKey)
+        else:
+            return render_template('error/general.html', "Either the url is no longer valid, or you are here by mistake.")
+
+    if request.method == 'POST':
+        if (resetPassDetails and checkPasswordResetValidity(resetPassDetails[1], resetPassDetails['activated'])):
+            password = request.form['password']
+            password_repeat = request.form['password_repeat']
+            if not password:
+                error = 'Password is required.'
+            elif not password_repeat:
+                error = 'Password Repeat is required.'
+            elif password != password_repeat:
+                error = 'Passwords do not match.'
+            if error is None:
+                print("done")
+                db.execute(
+                    'UPDATE users SET password = ? WHERE id = ?',
+                    (generate_password_hash(password), resetPassDetails['user_id']))
+                db.execute(
+                    'UPDATE resetPass SET activated = ? WHERE reset_key = ?',
+                    (1, resetKey))
+                db.commit() 
+                notif.send_email(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id'],)).fetchone(), "End Stat Password Reset", "Your password was reset.")
+                return redirect(url_for('auth.login'))
+
+    return render_template('auth/reset-password.html', error=error)       
+
+        
+def checkPasswordResetValidity(genTime, activated):
+    generatedDateTime = datetime.datetime.strptime(genTime, "%Y-%m-%d %H:%M:%S")
+    nowDateTime = datetime.datetime.now()
+    diffSeconds = ((nowDateTime.hour * 60 + nowDateTime.minute) * 60 + nowDateTime.second) - ((generatedDateTime.hour * 60 + generatedDateTime.minute) * 60 + generatedDateTime.second)
+    if (activated == 0 and diffSeconds < 86400):
+        return True        
+    return False
+
+    
 
 
 @bp.before_app_request

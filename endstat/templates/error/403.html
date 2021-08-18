@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% set active_page = "404" %}
+{% set active_page = "403" %}
 {% block title %}End Stat{% endblock %}
 
 {% block headScripts %}
@@ -12,13 +12,13 @@
         <div class="container-fluid">
             <div class="text-center mt-5">
                 <div class="error mx-auto" data-text="404">
-                    <p class="m-0">404</p>
+                    <p class="m-0">403</p>
                 </div>
                 <p class="text-dark mb-5 lead">Page Not Found</p>
                 {% if g.user %}
-                <p class="text-black-50 mb-0">It looks like you found a glitch in the matrix...</p><a href="{{ url_for('main.dashboard') }}">← Back to Dashboard</a>
+                <p class="text-black-50 mb-0">You are not allowed here!</p><a href="{{ url_for('main.dashboard') }}">← Back to Dashboard</a>
                 {% else %}
-                <p class="text-black-50 mb-0">It looks like you found a glitch in the matrix...</p><a href="{{ url_for('main.index') }}">← Back to Home</a>
+                <p class="text-black-50 mb-0">You are not allowed here!</p><a href="{{ url_for('main.index') }}">← Back to Home</a>
                 {% endif %}
             </div>
         </div>
