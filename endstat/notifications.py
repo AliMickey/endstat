@@ -1,13 +1,10 @@
-import os, requests
-from dotenv import load_dotenv
-load_dotenv(os.getenv('ENVFILE'))
-
-MAILGUN_API = os.environ.get('MAILGUN_API')
+import requests
+from flask import current_app
 
 def send_email(recipient, subject, message):
 	return requests.post(
 		"https://api.mailgun.net/v3/endstat.com/messages",
-		auth=("api", MAILGUN_API),
+		auth=("api", current_app.config['MAILGUN_API']),
 		data={"from": "End Stat <info@endstat.com>",
 			"to": recipient,
 			"subject": subject,
