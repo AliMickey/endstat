@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS resetPass;
+DROP TABLE IF EXISTS websites;
 
 CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,5 +15,12 @@ CREATE TABLE resetPass (
   user_id INTEGER,
   date_time TEXT NOT NULL, 
   activated BOOLEAN NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE websites (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  url TEXT NOT NULL,
+  user_id INTEGER,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );

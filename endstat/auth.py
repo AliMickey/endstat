@@ -1,6 +1,6 @@
 import functools
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, g, redirect, render_template, request, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from endstat.db import get_db
@@ -9,7 +9,7 @@ import uuid, datetime
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-
+# Views
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     error = None
@@ -25,6 +25,8 @@ def register():
             error = 'First name is required.'
         elif not email:
             error = 'Email is required.'
+        elif len(password) < 8:
+            error = 'Password is shorter than 8 characters.'
         elif not password:
             error = 'Password is required.'
         elif password != password_repeat:
@@ -35,8 +37,7 @@ def register():
         if error is None:
             # Create user
             db.execute(
-                'INSERT INTO users (first_name, email, password) VALUES (?, ?, ?)',
-                (first_name, email, generate_password_hash(password)))
+                'INSERT INTO users (first_name, email, password) VALUES (?, ?, ?)', (first_name, email, generate_password_hash(password)))
             db.commit()
             notif.send_email(email, "Welcome to End Stat", "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
             return redirect(url_for('auth.login'))
@@ -131,16 +132,21 @@ def resetPassword(resetKey):
 
     return render_template('auth/reset-password.html', error=error)       
 
-        
+
+@bp.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('main.index'))
+
+
+# Functions        
 def checkPasswordResetValidity(genTime, activated):
     generatedDateTime = datetime.datetime.strptime(genTime, "%Y-%m-%d %H:%M:%S")
     nowDateTime = datetime.datetime.now()
     diffSeconds = ((nowDateTime.hour * 60 + nowDateTime.minute) * 60 + nowDateTime.second) - ((generatedDateTime.hour * 60 + generatedDateTime.minute) * 60 + generatedDateTime.second)
     if (activated == 0 and diffSeconds < 86400):
         return True        
-    return False
-
-    
+    return False 
 
 
 @bp.before_app_request
@@ -152,10 +158,6 @@ def load_logged_in_user():
         g.user = get_db().execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
 
 
-@bp.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('main.index'))
 
 
 def login_required(view):
