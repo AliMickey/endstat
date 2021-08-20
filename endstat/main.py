@@ -1,9 +1,10 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, send_file
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, send_file
 )
 from endstat.db import get_db
 from endstat.auth import login_required
 from werkzeug.security import check_password_hash, generate_password_hash
+import endstat.notifications as notif
 
 bp = Blueprint('main', __name__)
 
@@ -29,6 +30,7 @@ def websiteList():
 @login_required
 def addWebsite():
     error = None
+    db = get_db()
     if request.method == 'POST':
         url = request.form['url']
         certificate = request.form['certificate']
@@ -41,35 +43,45 @@ def addWebsite():
 def profileSettings():
     error = None
     db = get_db()  
+    userDetails = db.execute('SELECT id, password, email FROM users WHERE id = ?', (g.user['id'],)).fetchone()
     if request.method == 'POST':
         if request.form["btn"] == "user":
             first_name = request.form['first_name']
-            email = request.form['first_name']
+            email = request.form['email']
             if (first_name):
                 db.execute(
-                'UPDATE users SET first_name = ? WHERE id = ?', (first_name, g.user['id']))
+                'UPDATE users SET first_name = ? WHERE id = ?', (first_name, userDetails['id']))
                 db.commit()
             if (email):
                 db.execute(
-                'UPDATE users SET email = ? WHERE id = ?', (email, g.user['id']))
+                'UPDATE users SET email = ? WHERE id = ?', (email, userDetails['id']))
                 db.commit()
+                notif.send_email(userDetails['email'], "End Stat Password Reset", f"Letting you know that your email was changed to '{email}'")
+            session.clear()
+            return redirect(url_for('auth.login'))
             
         elif request.form["btn"] == "password":
             current_password = request.form['current_password']
             password = request.form['password']
             password_repeat = request.form['password_repeat']
+
             if not current_password or not password or not password_repeat:
                 error = "All fields are required."
+            elif check_password_hash(userDetails['password'], current_password):
+                error = "Current password is incorrect."
+            elif len(password) < 8:
+                error = 'Password is shorter than 8 characters.'
             elif password != password_repeat:
-                error = "New passwords do not match"
-
+                error = "New passwords do not match."
+           
             if error is None:
-                userPassword = db.execute('SELECT password FROM users WHERE id = ?', (g.user['id'],)).fetchone()
-                if (check_password_hash(userPassword[0], current_password)):
-                    db.execute('UPDATE users SET password = ? WHERE id = ?', (generate_password_hash(password), g.user['id']))
-                    db.commit()
-            
-    return render_template('profile-settings.html', error=error)
+                db.execute('UPDATE users SET password = ? WHERE id = ?', (generate_password_hash(password), userDetails['id']))
+                db.commit()
+                notif.send_email(userDetails['email'], "End Stat Password Reset", "Letting you know that your password was reset.")
+                session.clear()
+                return redirect(url_for('auth.login'))
+
+    return render_template('profile-settings.html', error=error, currentEmail=userDetails['email'])
 
 
 # Error views

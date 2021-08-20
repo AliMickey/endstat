@@ -127,7 +127,8 @@ def resetPassword(resetKey):
                     'UPDATE resetPass SET activated = ? WHERE reset_key = ?',
                     (1, resetKey))
                 db.commit() 
-                notif.send_email(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id'],)).fetchone(), "End Stat Password Reset", "Your password was reset.")
+                notif.send_email(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id'],)).fetchone(), "End Stat Password Reset", "Letting you know that your password was reset.")
+                session.clear()
                 return redirect(url_for('auth.login'))
 
     return render_template('auth/reset-password.html', error=error)       

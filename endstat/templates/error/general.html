@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% set active_page = "403" %}
+{% set active_page = "error" %}
 {% block title %}End Stat{% endblock %}
 
 {% block headScripts %}
@@ -16,9 +16,18 @@
                 </div>
                 <p class="text-dark mb-5 lead">Error</p>
                 {% if g.user %}
-                <p class="text-black-50 mb-0">Something went wrong</p><a href="{{ url_for('main.dashboard') }}">← Back to Dashboard</a>
+                <p class="text-black-50 mb-0">
+                    {% if error %}
+                        <div class="text-center">        
+                            <p class="text-dark mb-4">{{ error }}</p>  
+                        </div>  
+                    {% endif %}</p><a href="{{ url_for('main.dashboard') }}">← Back to Dashboard</a>
                 {% else %}
-                <p class="text-black-50 mb-0">Something went wrong</p><a href="{{ url_for('main.index') }}">← Back to Home</a>
+                <p class="text-black-50 mb-0">{% if error %}
+                    <div class="text-center">        
+                        <p class="text-dark mb-4">{{ error }}</p>  
+                    </div>  
+                {% endif %}</p><a href="{{ url_for('main.index') }}">← Back to Home</a>
                 {% endif %}
             </div>
         </div>

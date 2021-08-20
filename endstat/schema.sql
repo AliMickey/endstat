@@ -22,5 +22,9 @@ CREATE TABLE websites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   url TEXT NOT NULL,
   user_id INTEGER,
+  cont_monitor BOOLEAN,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );
+
+
+
