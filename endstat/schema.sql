@@ -20,9 +20,12 @@ CREATE TABLE resetPass (
 
 CREATE TABLE websites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  url TEXT NOT NULL,
+  domain TEXT NOT NULL,
+  protocol TEXT NOT NULL,
+  certificate_check BOOLEAN,
+  ports_check BOOLEAN,
+  blacklists_check BOOLEAN,
   user_id INTEGER,
-  cont_monitor BOOLEAN,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );
 

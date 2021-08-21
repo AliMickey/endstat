@@ -5,6 +5,7 @@ from endstat.db import get_db
 from endstat.auth import login_required
 from werkzeug.security import check_password_hash, generate_password_hash
 import endstat.notifications as notif
+import validators
 
 bp = Blueprint('main', __name__)
 
@@ -23,7 +24,14 @@ def dashboard():
 @bp.route('/websites')
 @login_required
 def websiteList():
-    return render_template('websites/website-list.html')
+    db = get_db()
+    websiteDict = {}
+    websitesDB = db.execute('SELECT domain, protocol, id FROM websites WHERE user_id = ?', (g.user['id'],)).fetchall()
+    for row in websitesDB:
+        domain, protocol, id = row
+        websiteDict[domain] = [protocol, id]
+
+    return render_template('websites/website-list.html', websites=websiteDict)
 
 
 @bp.route('/websites/add-website', methods=('GET', 'POST'))
@@ -32,10 +40,28 @@ def addWebsite():
     error = None
     db = get_db()
     if request.method == 'POST':
-        url = request.form['url']
-        certificate = request.form['certificate']
+        domain = request.form['domain']
+        protocol = request.form.get('protocol')
 
-    return render_template('websites/add-website.html')
+        if not domain or not validators.domain(domain):
+            error = "A valid URL is required"
+
+        if error is None:
+            certCheck = portCheck = blistCheck = 0
+            if (request.form.get('certificate')): certCheck = 1
+            if (request.form.get('ports')): portCheck = 1
+            if (request.form.get('blacklists')): blistCheck = 1
+            db.execute(
+                    'INSERT INTO websites (domain, protocol, user_id, certificate_check, ports_check, blacklists_check) VALUES (?, ?, ?, ?, ?, ?)', 
+                        (domain, protocol, g.user['id'], certCheck, portCheck, blistCheck))
+            db.commit()
+    return render_template('websites/add-website.html', error=error)
+
+
+@bp.route('/websites/settings/<int:websiteId>')
+@login_required
+def websiteSettings(websiteId):
+    db = get_db()
 
 
 @bp.route('/profile', methods=('GET', 'POST'))

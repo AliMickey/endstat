@@ -2,6 +2,7 @@ import functools
 from flask import (
     Blueprint, g, redirect, render_template, request, session, url_for
 )
+import validators
 from werkzeug.security import check_password_hash, generate_password_hash
 from endstat.db import get_db
 import endstat.notifications as notif
@@ -23,8 +24,8 @@ def register():
 
         if not first_name:
             error = 'First name is required.'
-        elif not email:
-            error = 'Email is required.'
+        elif not email or not validators.email(email):
+            error = 'Valid email is required.'
         elif len(password) < 8:
             error = 'Password is shorter than 8 characters.'
         elif not password:

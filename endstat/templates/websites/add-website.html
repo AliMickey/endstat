@@ -18,9 +18,16 @@
                                     <h4 class="text-dark mb-4">Add a Website</h4>
                                 </div>
                                 <form class="user" method="post">
-                                    <div class="mb-3"><input class="form-control form-control-user" type="url" id="exampleInputURL" aria-describedby="urlHelp" placeholder="Enter Website URL..." name="url" required></div>                     
+                                    <div class="row mb-3">
+                                        <div class="col-sm-3"><select class="form-select" name="protocol" style="height: 55px;border-radius: 160px;font-size:14px;">
+                                                <option value="https" selected>https://</option>
+                                                <option value="http">http://</option>
+                                            </select></div>
+                                        <div class="col-sm-9"><input class="form-control form-control-user" type="text" id="exampleInputText" aria-describedby="textHelp" placeholder="endstat.com" name="domain" required>
+                                        </div>
+                                    </div>
                                     <div class="mb-3">
-                                        <div class="custom-control custom-checkbox small">
+                                        <div class="custom-control custom-checkbox medium">
                                             <h4 class="text-dark mb-4">Check:</h4>
                                             <div class="form-check"><input class="form-check-input custom-control-input" type="checkbox" id="formCheck-1" name="certificate"/><label class="form-check-label custom-control-label" for="formCheck-1">Certificate</label></div>
                                             <div class="form-check"><input class="form-check-input custom-control-input" type="checkbox" id="formCheck-1" name="ports"/><label class="form-check-label custom-control-label" for="formCheck-1">Ports</label></div>
