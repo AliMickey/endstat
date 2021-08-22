@@ -10,6 +10,16 @@ import uuid, datetime
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+# Global authentication checker
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('auth.login'))
+        return view(**kwargs)
+    return wrapped_view
+
+
 # Views
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
@@ -92,7 +102,6 @@ def forgotPassword():
                 print("new key generated")
 
             notif.send_email(email, "Password Reset for EndStat", f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
-        
         error = "If your email exists in our system, you will receive an email soon with instructions. Check your spam if you do not see it."
 
     return render_template('auth/forgot-password.html', error=error)
@@ -135,6 +144,52 @@ def resetPassword(resetKey):
     return render_template('auth/reset-password.html', error=error)       
 
 
+@bp.route('/profile', methods=('GET', 'POST'))
+@login_required
+def profileSettings():
+    error = None
+    db = get_db()  
+    userDetails = db.execute('SELECT id, first_name, password, email FROM users WHERE id = ?', (g.user['id'],)).fetchone()
+    if request.method == 'POST':
+        if request.form["btn"] == "user":
+            first_name = request.form['first_name']
+            email = request.form['email']
+            if (first_name):
+                db.execute(
+                'UPDATE users SET first_name = ? WHERE id = ?', (first_name, userDetails['id']))
+                db.commit()
+            if (email):
+                db.execute(
+                'UPDATE users SET email = ? WHERE id = ?', (email, userDetails['id']))
+                db.commit()
+                notif.send_email(userDetails['email'], "End Stat Password Reset", f"Letting you know that your email was changed to '{email}'")
+            session.clear()
+            return redirect(url_for('auth.login'))
+            
+        elif request.form["btn"] == "password":
+            current_password = request.form['current_password']
+            password = request.form['password']
+            password_repeat = request.form['password_repeat']
+
+            if not current_password or not password or not password_repeat:
+                error = "All fields are required."
+            elif check_password_hash(userDetails['password'], current_password):
+                error = "Current password is incorrect."
+            elif len(password) < 8:
+                error = 'Password is shorter than 8 characters.'
+            elif password != password_repeat:
+                error = "New passwords do not match."
+           
+            if error is None:
+                db.execute('UPDATE users SET password = ? WHERE id = ?', (generate_password_hash(password), userDetails['id']))
+                db.commit()
+                notif.send_email(userDetails['email'], "End Stat Password Reset", "Letting you know that your password was reset.")
+                session.clear()
+                return redirect(url_for('auth.login'))
+
+    return render_template('auth/profile-settings.html', error=error, currentFName=userDetails['first_name'], currentEmail=userDetails['email'])
+
+
 @bp.route('/logout')
 def logout():
     session.clear()
@@ -151,6 +206,15 @@ def checkPasswordResetValidity(genTime, activated):
     return False 
 
 
+def checkWebsiteAuthentication(websiteId):
+    # Check if a given website id is owned by the current user.
+    db = get_db()
+    if db.execute('SELECT EXISTS(SELECT 1 FROM websites WHERE user_id = ? AND id = ?)', (g.user['id'], websiteId)).fetchone()[0]:
+        return True
+    return False
+
+
+
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
@@ -160,12 +224,3 @@ def load_logged_in_user():
         g.user = get_db().execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
 
 
-
-
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-        return view(**kwargs)
-    return wrapped_view
