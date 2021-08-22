@@ -12,9 +12,9 @@ CREATE TABLE users (
 CREATE TABLE resetPass (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   reset_key TEXT UNIQUE NOT NULL,
-  user_id INTEGER,
   date_time TEXT NOT NULL, 
   activated BOOLEAN NOT NULL,
+  user_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
@@ -22,12 +22,28 @@ CREATE TABLE websites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   domain TEXT NOT NULL,
   protocol TEXT NOT NULL,
-  certificate_check BOOLEAN,
+  cert_check BOOLEAN,
   ports_check BOOLEAN,
   blacklists_check BOOLEAN,
-  user_id INTEGER,
+  user_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE TABLE website_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date_time TEXT NOT NULL,
+  cert_errors TEXT NOT NULL,
+  open_ports TEXT NOT NULL,
+  blacklists TEXT NOT NULL,
+  website_id INTEGER NOT NULL,
+  FOREIGN KEY (website_id) REFERENCES websites (id)
+);
 
-
+CREATE TABLE user_alerts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date_time TEXT NOT NULL,
+  type TEXT NOT NULL,
+  alert TEXT NOT NULL,
+  user_id INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users (id)
+);
