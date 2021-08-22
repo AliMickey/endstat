@@ -1,13 +1,12 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, session, url_for, send_file, current_app
 )
-import validators, datetime, favicon, os, requests, shutil, subprocess
+import validators, datetime
 from endstat.db import get_db
 from werkzeug.exceptions import abort
 from endstat.auth import login_required, checkWebsiteAuthentication
 import endstat.notifications as notif
 from flask import current_app
-import sqlite3
 
 
 bp = Blueprint('websites', __name__)
