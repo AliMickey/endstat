@@ -50,7 +50,7 @@ def register():
             db.execute(
                 'INSERT INTO users (first_name, email, password) VALUES (?, ?, ?)', (first_name, email, generate_password_hash(password)))
             db.commit()
-            notif.send_email(email, "Welcome to End Stat", "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
+            #TEMPDISABLE notif.send_email(email, "Welcome to End Stat", "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
             return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', error=error)

@@ -1,12 +1,23 @@
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS user_alerts;
 DROP TABLE IF EXISTS resetPass;
 DROP TABLE IF EXISTS websites;
+DROP TABLE IF EXISTS website_log;
 
 CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   first_name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL
+);
+
+CREATE TABLE user_alerts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date_time TEXT NOT NULL,
+  type TEXT NOT NULL,
+  alert TEXT NOT NULL,
+  user_id INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE resetPass (
@@ -32,18 +43,10 @@ CREATE TABLE websites (
 CREATE TABLE website_log (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   date_time TEXT NOT NULL,
+  status TEXT NOT NULL,
   cert_errors TEXT NOT NULL,
   open_ports TEXT NOT NULL,
   blacklists TEXT NOT NULL,
   website_id INTEGER NOT NULL,
   FOREIGN KEY (website_id) REFERENCES websites (id)
-);
-
-CREATE TABLE user_alerts (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  date_time TEXT NOT NULL,
-  type TEXT NOT NULL,
-  alert TEXT NOT NULL,
-  user_id INTEGER NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users (id)
 );
