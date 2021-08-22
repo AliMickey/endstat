@@ -33,9 +33,9 @@ CREATE TABLE websites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   domain TEXT NOT NULL,
   protocol TEXT NOT NULL,
-  cert_check BOOLEAN,
-  ports_check BOOLEAN,
-  blacklists_check BOOLEAN,
+  cert_check BOOLEAN NOT NULL,
+  ports_check BOOLEAN NOT NULL,
+  blacklists_check BOOLEAN NOT NULL,
   user_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );

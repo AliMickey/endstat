@@ -3,8 +3,8 @@
 {% block title %}End Stat - Websites{% endblock %}
 
 {% block headScripts %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/font-awesome.all.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/fonts/fontawesome5-overrides.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.all.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fontawesome5-overrides.min.css') }}">
 {% endblock %}
 
 {% block content %}  
@@ -37,20 +37,16 @@
                                 <tbody>
                                     {% for domain,details in websites.items() %}
                                     <tr>
-                                        <td><img class="rounded-circle me-2" width="30" height="30" src="{{ url_for('static', filename='assets/img/websites/{{domain}}.ico') }}">{{domain}}</td>
-                                        <td>{{details[0]}}</td>
+                                        <td>{{domain}}</td>
+                                        <td> {{details[0]}}
+                                            {% if details[0] == 'https' %}  
+                                                <i class="fa fa-lock"></i>
+                                            {% endif %}
+                                        </td>
                                         <td>Ok</td>
                                         <td><a class="btn btn-primary btn-sm" href="{{ url_for('websites.viewWebsite', websiteId=details[1]) }}"><i class="fas fa-add fa-sm text-white-50"></i>View</a></td>                                    </tr>
                                     {% endfor %}
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td><strong>Domain</strong></td>
-                                        <td><strong>Protocol</strong></td>
-                                        <td><strong>Status</strong></td>
-                                        <td><strong>More Info</strong></td>
-                                    </tr>
-                                </tfoot>
                             </table>
                         </div>
                         <div class="row">
@@ -67,5 +63,5 @@
 {% endblock %}
 
 {% block bodyScripts %}
-    <script src="{{ url_for('static', filename='assets/js/bs-init.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bs-init.js') }}"></script>
 {% endblock %}   

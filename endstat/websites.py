@@ -1,11 +1,14 @@
 from flask import (
-    Blueprint, g, redirect, render_template, request, session, url_for, send_file
+    Blueprint, g, redirect, render_template, request, session, url_for, send_file, current_app
 )
-import validators
+import validators, datetime, favicon, os, requests, shutil, subprocess
 from endstat.db import get_db
 from werkzeug.exceptions import abort
 from endstat.auth import login_required, checkWebsiteAuthentication
 import endstat.notifications as notif
+from flask import current_app
+import sqlite3
+
 
 bp = Blueprint('websites', __name__)
 
@@ -35,6 +38,9 @@ def addWebsite():
         if not domain or not validators.domain(domain):
             error = "A valid URL is required"
 
+        elif db.execute('SELECT EXISTS(SELECT 1 FROM websites WHERE user_id = ? AND domain = ?)', (g.user['id'], domain)).fetchone()[0]:
+            error = "This website already exists."
+
         if error is None:
             certCheck = portCheck = blistCheck = 0
             if (request.form.get('certificate')): certCheck = 1
@@ -44,6 +50,11 @@ def addWebsite():
                     'INSERT INTO websites (domain, protocol, user_id, cert_check, ports_check, blacklists_check) VALUES (?, ?, ?, ?, ?, ?)', 
                         (domain, protocol, g.user['id'], certCheck, portCheck, blistCheck))
             db.commit()
+            websiteId = db.execute('SELECT id FROM websites WHERE domain = ? AND user_id = ?', (domain, g.user['id'])).fetchone()['id']
+            db.execute(
+                    'INSERT INTO website_log (date_time, status, cert_errors, open_ports, blacklists, website_id) VALUES (?, ?, ?, ?, ?, ?)', 
+                        (datetime.datetime.now(), "N/A", "N/A", "N/A", "N/A", websiteId))
+            db.commit()
             return redirect(url_for('websites.websiteList'))
 
     return render_template('websites/add-website.html', error=error)
@@ -52,16 +63,14 @@ def addWebsite():
 @bp.route('/websites/view/<int:websiteId>', methods=('GET', 'POST'))
 @login_required
 def viewWebsite(websiteId):
-    error = None
     db = get_db()
-    websiteDict = {}
     if checkWebsiteAuthentication(websiteId):
-        websitesDB = db.execute('SELECT * FROM websites WHERE id = ?', (websiteId,)).fetchone()
-        for row in websitesDB:
-                domain, protocol, certificate_check, ports_check, blacklists_check = row
-                websiteDict[domain] = [protocol, id]
-
-        return render_template('websites/website.html', error=error) 
+        # Get latest website scan results
+        websitesDB = db.execute('SELECT * FROM website_log WHERE website_id = ? AND id = (SELECT MAX(id) FROM website_log)', 
+            (int(websiteId),)).fetchone()
+        domain = db.execute('SELECT domain FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
+        
+        return render_template('websites/website.html', website=websitesDB, domain=domain) 
     
     else:
         abort(403)
