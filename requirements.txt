@@ -1,6 +1,6 @@
 Flask
 gunicorn
-python-dotenv
 requests
 discord_webhook
 validators
+pysafebrowsing

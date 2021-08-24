@@ -6,7 +6,6 @@ from endstat.db import get_db
 from werkzeug.exceptions import abort
 from endstat.auth import login_required, checkWebsiteAuthentication
 import endstat.notifications as notif
-from flask import current_app
 
 
 bp = Blueprint('websites', __name__)
@@ -51,7 +50,7 @@ def addWebsite():
             db.commit()
             websiteId = db.execute('SELECT id FROM websites WHERE domain = ? AND user_id = ?', (domain, g.user['id'])).fetchone()['id']
             db.execute(
-                    'INSERT INTO website_log (date_time, status, cert_errors, open_ports, blacklists, website_id) VALUES (?, ?, ?, ?, ?, ?)', 
+                    'INSERT INTO website_log (date_time, status, cert_expiry, ports_open, safety_check, website_id) VALUES (?, ?, ?, ?, ?, ?)', 
                         (datetime.datetime.now(), "N/A", "N/A", "N/A", "N/A", websiteId))
             db.commit()
             return redirect(url_for('websites.websiteList'))

@@ -24,6 +24,7 @@ def dashboard():
 def page_not_found(e):
     return render_template('error/404.html'), 404
 
+
 @bp.app_errorhandler(403)
 def authorisation_error(e):
     return render_template('error/403.html'), 403
