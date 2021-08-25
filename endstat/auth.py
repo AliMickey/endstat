@@ -1,12 +1,11 @@
-import functools
+from endstat import notifications
 from flask import (
     Blueprint, g, redirect, render_template, request, session, url_for
 )
-import validators
+import functools, uuid, datetime, validators
 from werkzeug.security import check_password_hash, generate_password_hash
 from endstat.db import get_db
-import endstat.notifications as notif
-import uuid, datetime
+from endstat.notifications import sendNotification
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -50,7 +49,12 @@ def register():
             db.execute(
                 'INSERT INTO users (first_name, email, password) VALUES (?, ?, ?)', (first_name, email, generate_password_hash(password)))
             db.commit()
-            #TEMPDISABLE notif.send_email(email, "Welcome to End Stat", "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
+            userID = int(db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone()[0])
+            db.execute(
+                'INSERT INTO notification_settings (email, email_enabled, discord_enabled, user_id) VALUES (?, ?, ?, ?)', 
+                    (email, 1, 0, userID))
+            db.commit()
+            #TEMPDISABLE sendNotification(userID, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
             return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', error=error)
@@ -101,7 +105,7 @@ def forgotPassword():
                 db.commit()
                 print("new key generated")
 
-            notif.send_email(email, "Password Reset for EndStat", f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
+            sendNotification(g.user['id'], f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
         error = "If your email exists in our system, you will receive an email soon with instructions. Check your spam if you do not see it."
 
     return render_template('auth/forgot-password.html', error=error)
@@ -137,57 +141,11 @@ def resetPassword(resetKey):
                     'UPDATE resetPass SET activated = ? WHERE reset_key = ?',
                     (1, resetKey))
                 db.commit() 
-                notif.send_email(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id'],)).fetchone(), "End Stat Password Reset", "Letting you know that your password was reset.")
+                sendNotification(resetPassDetails['user_id'], "Letting you know that your password was reset.")
                 session.clear()
                 return redirect(url_for('auth.login'))
 
     return render_template('auth/reset-password.html', error=error)       
-
-
-@bp.route('/profile', methods=('GET', 'POST'))
-@login_required
-def profileSettings():
-    error = None
-    db = get_db()  
-    userDetails = db.execute('SELECT id, first_name, password, email FROM users WHERE id = ?', (g.user['id'],)).fetchone()
-    if request.method == 'POST':
-        if request.form["btn"] == "user":
-            first_name = request.form['first_name']
-            email = request.form['email']
-            if (first_name):
-                db.execute(
-                'UPDATE users SET first_name = ? WHERE id = ?', (first_name, userDetails['id']))
-                db.commit()
-            if (email):
-                db.execute(
-                'UPDATE users SET email = ? WHERE id = ?', (email, userDetails['id']))
-                db.commit()
-                notif.send_email(userDetails['email'], "End Stat Password Reset", f"Letting you know that your email was changed to '{email}'")
-            session.clear()
-            return redirect(url_for('auth.login'))
-            
-        elif request.form["btn"] == "password":
-            current_password = request.form['current_password']
-            password = request.form['password']
-            password_repeat = request.form['password_repeat']
-
-            if not current_password or not password or not password_repeat:
-                error = "All fields are required."
-            elif check_password_hash(userDetails['password'], current_password):
-                error = "Current password is incorrect."
-            elif len(password) < 8:
-                error = 'Password is shorter than 8 characters.'
-            elif password != password_repeat:
-                error = "New passwords do not match."
-           
-            if error is None:
-                db.execute('UPDATE users SET password = ? WHERE id = ?', (generate_password_hash(password), userDetails['id']))
-                db.commit()
-                notif.send_email(userDetails['email'], "End Stat Password Reset", "Letting you know that your password was reset.")
-                session.clear()
-                return redirect(url_for('auth.login'))
-
-    return render_template('auth/profile-settings.html', error=error, currentFName=userDetails['first_name'], currentEmail=userDetails['email'])
 
 
 @bp.route('/logout')
@@ -206,13 +164,12 @@ def checkPasswordResetValidity(genTime, activated):
     return False 
 
 
+# Check if a given website id is owned by the current user.
 def checkWebsiteAuthentication(websiteId):
-    # Check if a given website id is owned by the current user.
     db = get_db()
     if db.execute('SELECT EXISTS(SELECT 1 FROM websites WHERE user_id = ? AND id = ?)', (g.user['id'], websiteId)).fetchone()[0]:
         return True
     return False
-
 
 
 @bp.before_app_request
@@ -222,5 +179,3 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = get_db().execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
-
-

@@ -1,17 +1,16 @@
 from flask import (
-    Blueprint, g, redirect, render_template, request, session, url_for, send_file, current_app
+    Blueprint, g, redirect, render_template, request, url_for, current_app
 )
 import validators, datetime
 from endstat.db import get_db
 from werkzeug.exceptions import abort
 from endstat.auth import login_required, checkWebsiteAuthentication
-import endstat.notifications as notif
+from endstat.notifications import sendNotification
 
+bp = Blueprint('websites', __name__, url_prefix='/websites')
 
-bp = Blueprint('websites', __name__)
-
-
-@bp.route('/websites')
+# View for listing all websites
+@bp.route('/')
 @login_required
 def websiteList():
     db = get_db()
@@ -23,8 +22,8 @@ def websiteList():
 
     return render_template('websites/website-list.html', websites=websiteDict)
 
-
-@bp.route('/websites/add-website', methods=('GET', 'POST'))
+# View to add a website
+@bp.route('/add-website', methods=('GET', 'POST'))
 @login_required
 def addWebsite():
     error = None
@@ -35,7 +34,6 @@ def addWebsite():
 
         if not domain or not validators.domain(domain):
             error = "A valid URL is required"
-
         elif db.execute('SELECT EXISTS(SELECT 1 FROM websites WHERE user_id = ? AND domain = ?)', (g.user['id'], domain)).fetchone()[0]:
             error = "This website already exists."
 
@@ -57,8 +55,8 @@ def addWebsite():
 
     return render_template('websites/add-website.html', error=error)
 
-
-@bp.route('/websites/view/<int:websiteId>', methods=('GET', 'POST'))
+# View for viewing website specific logs
+@bp.route('/view/<int:websiteId>', methods=('GET', 'POST'))
 @login_required
 def viewWebsite(websiteId):
     db = get_db()
@@ -73,8 +71,8 @@ def viewWebsite(websiteId):
     else:
         abort(403)
 
-
-@bp.route('/websites/settings/<int:websiteId>')
+# View for managing website specific settings
+@bp.route('/settings/<int:websiteId>')
 @login_required
 def websiteSettings(websiteId):
     db = get_db()

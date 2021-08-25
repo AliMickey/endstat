@@ -27,6 +27,9 @@ def create_app(test_config=None):
     from . import websites
     app.register_blueprint(websites.bp)
 
+    from . import profile
+    app.register_blueprint(profile.bp)
+
     from . import main
     app.register_blueprint(main.bp)
     app.add_url_rule('/', endpoint='index')
