@@ -1,11 +1,10 @@
-from endstat import notifications
 from flask import (
     Blueprint, g, redirect, render_template, request, session, url_for
 )
 import functools, uuid, datetime, validators
 from werkzeug.security import check_password_hash, generate_password_hash
 from endstat.db import get_db
-from endstat.notifications import sendNotification
+from endstat.notifications import sendEmail
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -18,8 +17,7 @@ def login_required(view):
         return view(**kwargs)
     return wrapped_view
 
-
-# Views
+# View to register a new user
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     error = None
@@ -59,7 +57,7 @@ def register():
 
     return render_template('auth/register.html', error=error)
 
-
+# View to login to the system
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
     error = None
@@ -79,7 +77,7 @@ def login():
 
     return render_template('auth/login.html', error=error)
 
-
+# View to request a new password link
 @bp.route('/forgot-password', methods=('GET', 'POST'))
 def forgotPassword():
     error = None
@@ -104,13 +102,12 @@ def forgotPassword():
                     (str(resetKey), userID, datetime.datetime.now(), False))
                 db.commit()
                 print("new key generated")
-
-            sendNotification(g.user['id'], f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
+            sendEmail(email, f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
         error = "If your email exists in our system, you will receive an email soon with instructions. Check your spam if you do not see it."
 
     return render_template('auth/forgot-password.html', error=error)
 
-
+# View to reset password via uuid
 @bp.route('/reset-password/<string:resetKey>', methods=('GET', 'POST'))
 def resetPassword(resetKey):
     error = None
@@ -120,7 +117,7 @@ def resetPassword(resetKey):
         if (resetPassDetails and checkPasswordResetValidity(resetPassDetails[1], resetPassDetails['activated'])): 
             return render_template('auth/reset-password.html', resetKey=resetKey)
         else:
-            return render_template('error/general.html', "Either the url is no longer valid, or you are here by mistake.")
+            return render_template('error/general.html', error="Either the url is no longer valid, or you are here by mistake.")
 
     if request.method == 'POST':
         if (resetPassDetails and checkPasswordResetValidity(resetPassDetails[1], resetPassDetails['activated'])):
@@ -133,28 +130,26 @@ def resetPassword(resetKey):
             elif password != password_repeat:
                 error = 'Passwords do not match.'
             if error is None:
-                print("done")
                 db.execute(
                     'UPDATE users SET password = ? WHERE id = ?',
                     (generate_password_hash(password), resetPassDetails['user_id']))
                 db.execute(
-                    'UPDATE resetPass SET activated = ? WHERE reset_key = ?',
-                    (1, resetKey))
+                    'UPDATE resetPass SET activated = 1 WHERE reset_key = ?',
+                    (resetKey,))
                 db.commit() 
-                sendNotification(resetPassDetails['user_id'], "Letting you know that your password was reset.")
+                sendEmail(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id',]))[0], "Letting you know that your password was reset.")
                 session.clear()
                 return redirect(url_for('auth.login'))
 
     return render_template('auth/reset-password.html', error=error)       
 
-
+# View to clear session
 @bp.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('main.index'))
 
-
-# Functions        
+# Function to check if reset password key is still valid       
 def checkPasswordResetValidity(genTime, activated):
     generatedDateTime = datetime.datetime.strptime(genTime, "%Y-%m-%d %H:%M:%S")
     nowDateTime = datetime.datetime.now()
@@ -162,7 +157,6 @@ def checkPasswordResetValidity(genTime, activated):
     if (activated == 0 and diffSeconds < 86400):
         return True        
     return False 
-
 
 # Check if a given website id is owned by the current user.
 def checkWebsiteAuthentication(websiteId):
@@ -175,7 +169,5 @@ def checkWebsiteAuthentication(websiteId):
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
-    if user_id is None:
-        g.user = None
-    else:
-        g.user = get_db().execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    if user_id is None: g.user = None
+    else: g.user = get_db().execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()

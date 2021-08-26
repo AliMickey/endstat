@@ -60,24 +60,33 @@ def settings():
                 session.clear()
                 return redirect(url_for('auth.login'))
 
-        elif request.form["btn"] == "notification":
-            chkEmail = request.form['chkEmail']
-            chkDiscord = request.form['chkDiscord']
+        elif request.form["btn"] == "notif":
+            chkEmail = request.form.get('chkEmail')
+            chkDiscord = request.form.get('chkDiscord')
+            print(chkDiscord)
             notifEmail = request.form['notifEmail']
             notifDiscord = request.form['notifDiscord']
 
-            if (chkEmail):
-                db.execute('UPDATE notification_setttings SET email_enabled = 1 WHERE user_id = ?', (g.user['id'],))
+
+            if (chkEmail == "on"):
+                db.execute('UPDATE notification_settings SET email_enabled = 1 WHERE user_id = ?', (g.user['id'],))
                 db.commit()
-            if (chkDiscord):
-                db.execute('UPDATE notification_setttings SET discord_enabled = 1 WHERE user_id = ?', (g.user['id'],))
+            else:
+                db.execute('UPDATE notification_settings SET email_enabled = 0 WHERE user_id = ?', (g.user['id'],))
+                db.commit()
+            if (chkDiscord == "on"):
+                db.execute('UPDATE notification_settings SET discord_enabled = 1 WHERE user_id = ?', (g.user['id'],))
+                db.commit()
+            else:
+                db.execute('UPDATE notification_settings SET discord_enabled = 0 WHERE user_id = ?', (g.user['id'],))
                 db.commit()
             if (notifEmail):
-                db.execute('UPDATE notification_setttings SET email = ? WHERE user_id = ?', (notifEmail, g.user['id'],))
+                db.execute('UPDATE notification_settings SET email = ? WHERE user_id = ?', (notifEmail, g.user['id']))
                 db.commit()
             if (notifDiscord):
-                db.execute('UPDATE notification_setttings SET discord = ? WHERE user_id = ?', (notifDiscord, g.user['id'],))
+                db.execute('UPDATE notification_settings SET discord = ? WHERE user_id = ?', (notifDiscord, g.user['id']))
                 db.commit()
+            return redirect(url_for('profile.settings'))
 
     return render_template('profile/profile-settings.html', error=error, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], notifDetails=notifDetails)
 
