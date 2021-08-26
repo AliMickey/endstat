@@ -1,0 +1,5 @@
+DATABASE = "endstat.sqlite"
+SECRET_KEY = "dev"
+MAILGUN_API = ""
+DISCORD_WEBHOOK = ""
+GOOGLE_API = ""
