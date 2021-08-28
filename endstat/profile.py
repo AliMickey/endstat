@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from endstat.auth import login_required
 from endstat.db import get_db
 from endstat.notifications import sendNotification
+import datetime
 
 bp = Blueprint('profile', __name__, url_prefix='/profile')
 
@@ -63,7 +64,6 @@ def settings():
         elif request.form["btn"] == "notif":
             chkEmail = request.form.get('chkEmail')
             chkDiscord = request.form.get('chkDiscord')
-            print(chkDiscord)
             notifEmail = request.form['notifEmail']
             notifDiscord = request.form['notifDiscord']
 
@@ -90,12 +90,28 @@ def settings():
 
     return render_template('profile/profile-settings.html', error=error, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], notifDetails=notifDetails)
 
-
 # View for user alerts
 @bp.route('/alerts', methods=('GET', 'POST'))
 @login_required
 def alerts():
     error = None
     db = get_db()
+    alertsDict = {}
+    alertsDB = db.execute('SELECT message, datetime(date_time), type FROM user_alerts WHERE user_id = ? ORDER BY id DESC LIMIT 5', (g.user['id'],)).fetchall()
+    for row in alertsDB:
+        message, dateTime, type = row
+        icon = getAlertIcon(type)
+        conv_date = datetime.datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
+        alertsDict[message] = [conv_date, type, icon]
+    
+    if (request.method == 'POST'):
+        db.execute('UPDATE user_alerts SET read = 1 WHERE id = ?', (request.form['read'],))
+        db.commit()
 
-    return render_template('profile/alerts.html', error=error, alerts=alerts)
+    return render_template('profile/alerts.html', error=error, alerts=alertsDict)
+
+# Convert alert type to respective icon
+def getAlertIcon(type):
+    if (type == "primary"): return "check"
+    elif (type == "warning"): return "asterisk"
+    elif (type == "danger"): return "exclamation-triangle"

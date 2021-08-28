@@ -5,6 +5,29 @@
 {% block headScripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.all.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fontawesome5-overrides.min.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            var table = $('#dataTable').DataTable({
+                "searching": false,
+                "ordering": false,
+                "paging":  false,
+                "info": false,
+            });
+            $('#tableSearch').keyup(function(){ 
+                var input = $(this).val();
+                // Hide all rows
+                $('#dataTable tbody tr').hide();
+                // Show each row that contains the input
+                var len = $('table tbody td:nth-child(1):contains("' + input + '")').length;
+                if(len > 0){
+                $('#dataTable tbody td:contains("' + input + '")').each(function(){
+                    $(this).closest('tr').show();
+                });
+                };
+            });
+        });
+    </script> 
 {% endblock %}
 
 {% block content %}  
@@ -18,13 +41,12 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="text-md dataTables_filter" id="dataTable_filter"><label class="form-label"><input type="search" class="form-control form-control-sm" aria-controls="dataTable" placeholder="Search"></label></div>
+                                <label class="form-label"><input type="search" class="form-control form-control-sm tableSearch" id="tableSearch" placeholder="Search"></label>
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3 text-md-end"><a class="btn btn-primary btn-sm" href="{{ url_for('websites.addWebsite') }}"><i class="fas fa-add fa-sm text-white-50"></i>Add Website</a></div>
+                                <div class="mb-3 text-md-end"><a class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addWebsiteModal"><i class="fas fa-add fa-sm text-white-50"></i>Add Website</a></div>
                             </div>
                         </div>
-                        <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
                             <table class="table my-0" id="dataTable">
                                 <thead>
                                     <tr>
@@ -38,21 +60,77 @@
                                     {% for domain,details in websites.items() %}
                                     <tr>
                                         <td>{{domain}}</td>
-                                        <td> {{details[0]}}
-                                            {% if details[0] == 'https' %}  
+                                        <td> {{details[1]}}
+                                            {% if details[1] == 'https' %}  
                                                 <i class="fa fa-lock"></i>
                                             {% endif %}
                                         </td>
                                         <td>Ok</td>
-                                        <td><a class="btn btn-primary btn-sm" href="{{ url_for('websites.viewWebsite', websiteId=details[1]) }}"><i class="fas fa-add fa-sm text-white-50"></i>View</a></td>                                    </tr>
+                                        <td>
+                                            <a class="btn btn-primary btn-sm" href="{{ url_for('websites.viewWebsite', websiteId=details[0]) }}"><i class="fas fa-add fa-sm text-white-50"></i>View</a>
+                                            <a class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteWebsiteModal-{{details[0]}}"><i class="fas fa-add fa-sm text-white-50"></i>Delete</a>
+                                        </td>
+                                    </tr>
+                                    <!-- Delete Website Modal -->
+                                    <div class="modal fade" id="deleteWebsiteModal-{{details[0]}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="addWebsiteLongTitle">Delete Website</h5>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to delete {{domain}}?</p>
+                                                    <form method="post">
+                                                        <input type="hidden" name="domainID" value={{details[0]}}></input>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger" name="btn" value="deleteWebsite">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     {% endfor %}
                                 </tbody>
                             </table>
-                        </div>
+                            <br>
                         <div class="row">
                             <div class="col-md-6 align-self-center">
                                 <p id="dataTable_info" class="dataTables_info" role="status" aria-live="polite">Showing {{websites|length}} website/s</p>
                             </div>
+                        </div>
+                    </div>
+                    {% if error %}
+                        <div class="text-center">        
+                            <p class="text-dark mb-4">{{ error }}</p>  
+                        </div>  
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Add Website Modal -->
+            <div class="modal fade" id="addWebsiteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addWebsiteLongTitle">Add Website</h5>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post">
+                                <div class="row mb-3">
+                                    <div class="col-sm-2"><select class="form-select" name="protocol">
+                                        <option value="https" selected>https://</option>
+                                        <option value="http">http://</option>
+                                    </select></div>
+                                    <div class="col-sm-10">
+                                        <input class="form-control form-control-user" type="text" id="exampleInputText" aria-describedby="textHelp" placeholder="endstat.com" name="domain" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary" name="btn" value="addWebsite">Add</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -64,4 +142,5 @@
 
 {% block bodyScripts %}
     <script src="{{ url_for('static', filename='js/bs-init.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
 {% endblock %}   

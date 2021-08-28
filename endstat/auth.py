@@ -52,6 +52,10 @@ def register():
                 'INSERT INTO notification_settings (email, email_enabled, discord_enabled, user_id) VALUES (?, ?, ?, ?)', 
                     (email, 1, 0, userID))
             db.commit()
+            db.execute(
+                'INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
+                    (datetime.datetime.now(), "primary", "Welcome to End Stat, we hope you enjoy it!", 0, userID))
+            db.commit()
             #TEMPDISABLE sendNotification(userID, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
             return redirect(url_for('auth.login'))
 
@@ -101,7 +105,6 @@ def forgotPassword():
                 db.execute('INSERT INTO resetPass (reset_key, user_id, date_time, activated) VALUES (?, ?, ?, ?) ', 
                     (str(resetKey), userID, datetime.datetime.now(), False))
                 db.commit()
-                print("new key generated")
             sendEmail(email, f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
         error = "If your email exists in our system, you will receive an email soon with instructions. Check your spam if you do not see it."
 

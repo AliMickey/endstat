@@ -19,7 +19,9 @@ CREATE TABLE user_alerts (
   message TEXT NOT NULL,
   read BOOLEAN NOT NULL,
   user_id INTEGER NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users (id)
+  website_id INTEGER,
+  FOREIGN KEY (user_id) REFERENCES users (id),
+  FOREIGN KEY (website_id) REFERENCES websites (id)
 );
 
 CREATE TABLE notification_settings (
@@ -45,9 +47,6 @@ CREATE TABLE websites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   domain TEXT NOT NULL,
   protocol TEXT NOT NULL,
-  cert_check BOOLEAN NOT NULL,
-  ports_check BOOLEAN NOT NULL,
-  blacklists_check BOOLEAN NOT NULL,
   user_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );

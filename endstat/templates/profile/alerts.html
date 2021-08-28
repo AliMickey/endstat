@@ -11,23 +11,21 @@
         <div id="content">
             {% include 'topNav.html' %}
             <div class="container-fluid">
-                <div class="row mb-3">
-                    <div class="col-lg-8">
-                        <div class="row">
-                            <div class="col">
-                                <div class="card shadow mb-3">
-                                    <div class="card-body">
-                                      
-                                        
-                                        {% if error %}
-                                            <div class="text-center">        
-                                                <p class="text-dark mb-4">{{ error }}</p>  
-                                            </div>  
-                                        {% endif %}
+                <div class="row">
+                    <div class="col-md-12 col-xl-8 offset-xl-2">
+                        {% for alert,details in alerts.items() %}
+                        <div class="card shadow border-start-primary py-2 bg-{{details[1]}}">
+                            <div class="card-body">
+                                <div class="row align-items-center no-gutters">
+                                    <div class="col me-2">
+                                        <div class="text-uppercase text-dark fw-bold text-s mb-1"><span>{{details[0]}}</span></div>
+                                        <div class="text-dark fw-bold h4 mb-0"><span>{{alert}}</span></div>
                                     </div>
+                                    <div class="col-auto"><i class="fas fa-{{details[2]}} fa-2x text-gray-300"></i></div>
                                 </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
