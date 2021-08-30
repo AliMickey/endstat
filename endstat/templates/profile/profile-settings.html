@@ -31,9 +31,9 @@
                                             </div>
                                             <div class="mb-3"><button class="btn btn-primary btn-sm" type="submit" name="btn" value="user">Save Settings</button></div>
                                         </form>
-                                        {% if error %}
+                                        {% if errorUser %}
                                             <div class="text-center">        
-                                                <p class="text-dark mb-4">{{ error }}</p>  
+                                                <p class="text-dark mb-4">{{ errorUser }}</p>  
                                             </div>  
                                         {% endif %}
                                     </div>
@@ -56,9 +56,9 @@
                                             </div>
                                             <div class="mb-3"><button class="btn btn-primary btn-sm" type="submit" name="btn" value="password">Update Password</button></div>
                                         </form>
-                                        {% if error %}
+                                        {% if errorPass %}
                                             <div class="text-center">
-                                                <p class="text-dark mb-4">{{ error }}</p>
+                                                <p class="text-dark mb-4">{{ errorPass }}</p>
                                             </div>
                                         {% endif %}
                                     </div>
@@ -86,9 +86,9 @@
                                             </div>
                                             <div class="mb-3"><button class="btn btn-primary btn-sm" type="submit" name="btn" value="notif">Save Settings</button></div>
                                         </form>
-                                        {% if error %}
+                                        {% if errorNotif %}
                                             <div class="text-center">        
-                                                <p class="text-dark mb-4">{{ error }}</p>  
+                                                <p class="text-dark mb-4">{{ errorNotif }}</p>  
                                             </div>  
                                         {% endif %}
                                     </div>

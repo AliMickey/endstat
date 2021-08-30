@@ -12,7 +12,9 @@ bp = Blueprint('profile', __name__, url_prefix='/profile')
 @bp.route('/', methods=('GET', 'POST'))
 @login_required
 def settings():
-    error = None
+    errorUser = None
+    errorPass = None
+    errorNotif = None
     db = get_db()  
     userDetails = db.execute('SELECT first_name, password, email FROM users WHERE id = ?', (g.user['id'],)).fetchone()
     notifDetails = db.execute('SELECT email, discord, email_enabled, discord_enabled FROM notification_settings WHERE user_id = ?', 
@@ -24,11 +26,11 @@ def settings():
             email = request.form['email']
 
             if (first_name and first_name is userDetails['first_name']):
-                error = "Your new name cannot be the same as your existing one."
+                errorUser = "Your new name cannot be the same as your existing one."
             elif (email and email is userDetails['email']):
-                error = "Your new email cannot be the same as your existing one."
+                errorUser = "Your new email cannot be the same as your existing one."
 
-            if error is None:
+            if errorUser is None:
                 if (first_name):
                     db.execute('UPDATE users SET first_name = ? WHERE id = ?', (first_name, g.user['id']))
                     db.commit()
@@ -46,15 +48,15 @@ def settings():
             password_repeat = request.form['password_repeat']
 
             if not current_password or not password or not password_repeat:
-                error = "All fields are required."
-            elif check_password_hash(userDetails['password'], current_password):
-                error = "Current password is incorrect."
+                errorPass = "All fields are required."
+            elif not check_password_hash(userDetails['password'], current_password):
+                errorPass = "Current password is incorrect."
             elif len(password) < 8:
-                error = 'Password is shorter than 8 characters.'
+                errorPass = 'Password is shorter than 8 characters.'
             elif password != password_repeat:
-                error = "New passwords do not match."
+                errorPass = "New passwords do not match."
            
-            if error is None:
+            if errorPass is None:
                 db.execute('UPDATE users SET password = ? WHERE id = ?', (generate_password_hash(password), g.user['id']))
                 db.commit()
                 sendNotification(g.user['id'], "Letting you know that your password was reset.")
@@ -66,7 +68,6 @@ def settings():
             chkDiscord = request.form.get('chkDiscord')
             notifEmail = request.form['notifEmail']
             notifDiscord = request.form['notifDiscord']
-
 
             if (chkEmail == "on"):
                 db.execute('UPDATE notification_settings SET email_enabled = 1 WHERE user_id = ?', (g.user['id'],))
@@ -88,7 +89,7 @@ def settings():
                 db.commit()
             return redirect(url_for('profile.settings'))
 
-    return render_template('profile/profile-settings.html', error=error, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], notifDetails=notifDetails)
+    return render_template('profile/profile-settings.html', errorUser=errorUser, errorPass=errorPass, errorNotif=errorNotif, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], notifDetails=notifDetails)
 
 # View for user alerts
 @bp.route('/alerts', methods=('GET', 'POST'))

@@ -50,9 +50,8 @@ def websiteList():
             db.commit()
             db.execute('DELETE FROM website_log WHERE website_id = ?', (domainID,))
             db.commit()
-            #db.execute('DELETE FROM user_alerts WHERE website_id = ?', (domainID,))
-            #db.commit()
-
+            db.execute('DELETE FROM user_alerts WHERE website_id = ?', (domainID,))
+            db.commit()
 
             return redirect(url_for('websites.websiteList'))
 

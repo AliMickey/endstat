@@ -140,7 +140,7 @@ def resetPassword(resetKey):
                     'UPDATE resetPass SET activated = 1 WHERE reset_key = ?',
                     (resetKey,))
                 db.commit() 
-                sendEmail(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id',]))[0], "Letting you know that your password was reset.")
+                sendEmail(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id'],)).fetchone()[0], "Letting you know that your password was reset.")
                 session.clear()
                 return redirect(url_for('auth.login'))
 
