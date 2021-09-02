@@ -10,7 +10,7 @@
         $(document).ready(function() {
             var table = $('#dataTable').DataTable({
                 "searching": false,
-                "ordering": false,
+                // "ordering": false,
                 "paging":  false,
                 "info": false,
             });
@@ -52,7 +52,6 @@
                                     <tr>
                                         <th>Domain</th>
                                         <th>Protocol</th>
-                                        <th>Status</th>
                                         <th>More Info</th>
                                     </tr>
                                 </thead>
@@ -65,7 +64,6 @@
                                                 <i class="fa fa-lock"></i>
                                             {% endif %}
                                         </td>
-                                        <td>Ok</td>
                                         <td>
                                             <a class="btn btn-primary btn-sm" href="{{ url_for('websites.viewWebsite', websiteId=details[0]) }}"><i class="fas fa-add fa-sm text-white-50"></i>View</a>
                                             <a class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteWebsiteModal-{{details[0]}}"><i class="fas fa-add fa-sm text-white-50"></i>Delete</a>

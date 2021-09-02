@@ -18,6 +18,20 @@ def index():
 @bp.route('/dashboard')
 @login_required
 def dashboard():
+    db = get_db()
+    dashboardDict = {}
+    # dashboardDB = db.execute('SELECT , FROM  WHERE user_id = ?', 
+	# 	(userID,)).fetchall() 
+
+    # dashboardLogDB = db.execute('SELECT , FROM  WHERE user_id = ?', 
+	# 	(userID,)).fetchall() 
+
+    # for row in dashboardDB:
+    #     message, dateTime, type = row
+    #     icon = getAlertIcon(type)
+    #     conv_date = datetime.datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
+    #     dashboardDict[message] = [conv_date, type, icon]
+
     return render_template('dashboard.html')
 
 # 404 page not found error
