@@ -22,7 +22,7 @@ def sendNotification(userID, message):
 	if (notifications['email_enabled']):
 		sendEmail(notifications['email'], message)
 		
-	if (notifications['discord_enabled']):
+	if (notifications['discord_enabled'] and notifications['discord']):
 		discordWebhook = DiscordWebhook(url=notifications['discord'])
 		embed = DiscordEmbed(title="End Stat Alert", description=message, color=242424)
 		discordWebhook.add_embed(embed).execute()
