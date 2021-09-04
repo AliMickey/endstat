@@ -1,4 +1,6 @@
 import socket, threading, sys, json, datetime
+from queue import Queue
+from threading import Thread
 from urllib.request import ssl, socket
 from pysafebrowsing import SafeBrowsing
 from flask import current_app
@@ -6,28 +8,36 @@ from flask import current_app
 print_lock = threading.Lock()
 socket.setdefaulttimeout(0.2)
 
-def portScanThread(domain, port):
-    openPorts = []
+# Open port scanner
+def portScanThread(ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try: 
-        remote_server_IP = socket.gethostbyname(domain)
-        result = sock.connect_ex((remote_server_IP, port))
+        result = sock.connect_ex((ip, port))
         if result == 0:
-            openPorts.append(port)
-            print(port)
+            return port
         sock.close()
     except socket.error:
-        print("Couldn't connect to host")
         sys.exit()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt: #dev temp
         sys.exit()
 
 # Return all open ports on domain with multi-threading
 def portScan(domain):
+    threadsList = list()
+    que = Queue() 
+    openPorts = []
+    remoteServerIP = socket.gethostbyname(domain) # Get ip for provided domain
     for x in range(65535):
-        thread = threading.Thread(target=portScan, args=(domain, x))
-        thread.daemon = True
+        thread = Thread(target=lambda q, arg1,arg2: q.put(portScanThread(arg1,arg2)), args=(que, remoteServerIP, x))
         thread.start()
+        threadsList.append(thread)
+    for t in threadsList:
+        t.join()
+    while not que.empty():
+        result = que.get()
+        if result is not None:
+            openPorts.append(result)
+    print(openPorts)
 
 # Return expiry date of ssl certificate on domain
 def sslCheck(domain):
