@@ -48,10 +48,12 @@ def register():
                 'INSERT INTO users (first_name, email, password) VALUES (?, ?, ?)', (first_name, email, generate_password_hash(password)))
             db.commit()
             userID = int(db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone()[0])
+            # Add default notification settings
             db.execute(
                 'INSERT INTO notification_settings (email, email_enabled, discord_enabled, user_id) VALUES (?, ?, ?, ?)', 
                     (email, 1, 0, userID))
             db.commit()
+            # Add first user alert
             db.execute(
                 'INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
                     (datetime.datetime.now(), "primary", "Welcome to End Stat, we hope you enjoy it!", 0, userID))
@@ -156,6 +158,7 @@ def logout():
 def checkPasswordResetValidity(genTime, activated):
     generatedDateTime = datetime.datetime.strptime(genTime, "%Y-%m-%d %H:%M:%S")
     nowDateTime = datetime.datetime.now()
+    # Calculate time period between present and key generation
     diffSeconds = ((nowDateTime.hour * 60 + nowDateTime.minute) * 60 + nowDateTime.second) - ((generatedDateTime.hour * 60 + generatedDateTime.minute) * 60 + generatedDateTime.second)
     if (activated == 0 and diffSeconds < 86400):
         return True        

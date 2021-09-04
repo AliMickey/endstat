@@ -12,6 +12,7 @@ bp = Blueprint('profile', __name__, url_prefix='/profile')
 @bp.route('/', methods=('GET', 'POST'))
 @login_required
 def settings():
+    # Individual error vars for each form
     errorUser = None
     errorPass = None
     errorNotif = None
@@ -69,6 +70,7 @@ def settings():
             notifEmail = request.form['notifEmail']
             notifDiscord = request.form['notifDiscord']
 
+            # Individual checks for notification agents
             if (chkEmail == "on"):
                 db.execute('UPDATE notification_settings SET email_enabled = 1 WHERE user_id = ?', (g.user['id'],))
                 db.commit()

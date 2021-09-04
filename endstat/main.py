@@ -45,6 +45,7 @@ def authorisation_error(e):
     return render_template('error/403.html'), 403
 
 
+# Supply each page view with unread user alerts.
 @bp.app_context_processor
 def injectNavDetails():
     db = get_db()
