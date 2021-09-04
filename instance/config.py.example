@@ -1,4 +1,5 @@
 DATABASE = "endstat.sqlite"
+SERVER_NAME = "domain.com"
 SECRET_KEY = "dev"
 MAILGUN_API = ""
 DISCORD_WEBHOOK = ""
