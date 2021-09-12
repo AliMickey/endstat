@@ -100,12 +100,12 @@ def alerts():
     error = None
     db = get_db()
     alertsDict = {}
-    alertsDB = db.execute('SELECT message, datetime(date_time), type FROM user_alerts WHERE user_id = ? ORDER BY id DESC LIMIT 5', (g.user['id'],)).fetchall()
+    alertsDB = db.execute('SELECT message, datetime(date_time), type, read FROM user_alerts WHERE user_id = ? ORDER BY id DESC LIMIT 5', (g.user['id'],)).fetchall()
     for row in alertsDB:
-        message, dateTime, type = row
+        message, dateTime, type, read = row
         icon = getAlertIcon(type)
         conv_date = datetime.datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
-        alertsDict[message] = [conv_date, type, icon]
+        alertsDict[message] = [conv_date, type, icon, bool(read)]
     
     if (request.method == 'POST'):
         db.execute('UPDATE user_alerts SET read = 1 WHERE id = ?', (request.form['read'],))
