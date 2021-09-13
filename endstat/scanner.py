@@ -4,6 +4,7 @@ from threading import Thread
 from urllib.request import ssl, socket
 from pysafebrowsing import SafeBrowsing
 from flask import current_app
+from endstat.db import get_db
 
 print_lock = threading.Lock()
 socket.setdefaulttimeout(0.2)
@@ -55,3 +56,16 @@ def safetyCheck(domain):
     if (check['malicious']):
         return True, check['threats']
     return False
+
+
+def websiteScanner(domainId):
+    db = get_db()
+    websiteResults = {}
+    website = db.execute('SELECT domain, protocol, user_id FROM websites WHERE id = ?', (domainId,)).fetchone()
+    domain = website[0]
+    ports = portScan(domain)
+    ssl = sslCheck(domain)
+    safety = safetyCheck(domain)
+    print("Ports:" + ports)
+    print("Cert:" + ssl)
+    print("Safety:" + safety)
