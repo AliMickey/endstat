@@ -28,6 +28,22 @@
             });
         });
     </script> 
+    <script>
+        $(document).ready(function() { 
+            document.getElementById("addWebsite").addEventListener ("click", scanAnimation, false);
+            function scanAnimation() {
+                if (!document.getElementById("addWebsiteInputText").value.trim() == "") {
+                    // disable button
+                    $(this).prop("disabled", true);
+                    // add spinner to button
+                    $(this).html(
+                        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Scanning`
+                    );
+                    document.getElementById("addWebsiteForm").submit()
+                }
+            }
+        });
+    </script>
 {% endblock %}
 
 {% block content %}  
@@ -77,8 +93,8 @@
                                                     <h5 class="modal-title" id="addWebsiteLongTitle">Delete Website</h5>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <p>Are you sure you want to delete {{domain}}?</p>
-                                                    <form method="post">
+                                                    <p>Are you sure you want to delete {{domain}}? All logs will also be removed</p>
+                                                    <form method="post" id="websiteInfoForm">
                                                         <input type="hidden" name="domainID" value={{details[0]}}></input>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -114,19 +130,20 @@
                             <h5 class="modal-title" id="addWebsiteLongTitle">Add Website</h5>
                         </div>
                         <div class="modal-body">
-                            <form method="post">
+                            <form method="post" id="addWebsiteForm">
                                 <div class="row mb-3">
                                     <div class="col-sm-2"><select class="form-select" name="protocol">
                                         <option value="https" selected>https://</option>
                                         <option value="http">http://</option>
                                     </select></div>
                                     <div class="col-sm-10">
-                                        <input class="form-control form-control-user" type="text" id="exampleInputText" aria-describedby="textHelp" placeholder="endstat.com" name="domain" required>
+                                        <input class="form-control form-control-user" type="text" id="addWebsiteInputText" aria-describedby="textHelp" placeholder="endstat.com (Root Domain Only)" name="domain" required>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary" name="btn" value="addWebsite">Add</button>
+                                    <button type="button" class="btn btn-primary" id="addWebsite">Add</button>
+                                    <input type="hidden" name="btn" value="addWebsite"></input>
                                 </div>
                             </form>
                         </div>
