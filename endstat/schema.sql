@@ -54,10 +54,11 @@ CREATE TABLE websites (
 CREATE TABLE website_log (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   date_time TEXT NOT NULL,
-  status TEXT NOT NULL,
-  cert_expiry TEXT NOT NULL,
-  ports_open TEXT NOT NULL,
-  safety_check TEXT NOT NULL,
+  status TEXT,
+  general TEXT,
+  ssl TEXT,
+  safety TEXT,
+  ports TEXT,
   website_id INTEGER NOT NULL,
   FOREIGN KEY (website_id) REFERENCES websites (id)
 );
