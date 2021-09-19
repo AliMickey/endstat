@@ -63,7 +63,7 @@ def viewWebsite(websiteId):
     db = get_db()
     if checkWebsiteAuthentication(websiteId):
         # Get latest website scan results
-        websitesDB = db.execute('SELECT datetime(date_time), status, general, ssl, safety, ports FROM website_log WHERE website_id = ? AND id = (SELECT MAX(id) FROM website_log)', 
+        websitesDB = db.execute('SELECT datetime(date_time), status, general, ssl, safety, ports FROM website_log WHERE id = (SELECT MAX(id) FROM website_log WHERE website_id = ?)', 
             (int(websiteId),)).fetchone()
 
         # Map and convert row data into dictionaries/strings
