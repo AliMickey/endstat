@@ -76,7 +76,7 @@ def viewWebsite(websiteId):
             safety = json.loads(websitesDB[4])
             ports = json.loads(websitesDB[5])
         except TypeError as e:
-            print(f"{e}. Error found at viewWebsite() in websites.py")
+            print(f"{e}: Error found at viewWebsite() in websites.py")
             return render_template('error/general.html', 
                 error="""
                     There was an error with loading the website scan results.
