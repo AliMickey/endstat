@@ -28,8 +28,10 @@ def register():
         password_repeat = request.form['password_repeat']
         db = get_db()
         tempUserID = db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone() 
-
-        if not first_name:
+        
+        if tempUserID is not None:
+            error = f'"{email}" is already registered.'
+        elif not first_name:
             error = 'First name is required.'
         elif not email or not validators.email(email):
             error = 'Valid email is required.'
@@ -39,8 +41,6 @@ def register():
             error = 'Password is required.'
         elif password != password_repeat:
             error = 'Passwords do not match.'
-        elif tempUserID is not None:
-            error = '"{}" is already registered.'.format(email)
 
         if error is None:
             # Create user
