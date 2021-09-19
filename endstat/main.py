@@ -34,6 +34,18 @@ def dashboard():
 
     return render_template('dashboard.html')
 
+# View for privacy policy
+@bp.route('/privacy-policy')
+@login_required
+def privacyPolicy():
+    return render_template('privacy-policy.html')
+
+# View for terms and conditions
+@bp.route('/terms-and-conditions')
+@login_required
+def termsAndConditions():
+    return render_template('terms-and-conditions.html')
+
 # 404 page not found error
 @bp.app_errorhandler(404)
 def page_not_found(e):
