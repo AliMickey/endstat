@@ -116,6 +116,8 @@
                                             {% endfor %}
                                         </tbody>
                                     </table>
+                                    <div style="text-align: center;"><span class="p-2 mx-1 bg-success text-white rounded">Safe</span><span class="p-2 mx-1 bg-warning text-white rounded">Warning</span><span class="p-2 mx-1 bg-danger text-white rounded">Danger</span></div>
+                                    <br>
                                 </div>
                             </div>
                         </div>
@@ -127,6 +129,19 @@
                                 <h5 class="text-dark fw-bold mb-1" style="display: inline-block;">Web Server:&nbsp</h5><span class="card-text h5">{{general['webServer']}}</span>
                                 <br>
                                 <h5 class="text-dark fw-bold mb-1" style="display: inline-block;">IP Address:&nbsp</h5><span class="card-text h5">{{general['ip']}}</span>
+                            </div>
+                        </div>
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="text-primary fw-bold m-0">External Lookup</h6>
+                            </div>
+                            <div class="card-body">
+                                <div style="text-align: center;">
+                                    <a type="button" class="btn btn-primary" target="_blank" href="https://www.virustotal.com/gui/domain/{{domain}}">VirusTotal</a>
+                                    <a type="button" class="btn btn-primary" target="_blank" href="https://securitytrails.com/domain/{{domain}}">Security Trails</a>
+                                    <a type="button" class="btn btn-primary" target="_blank" href="https://transparencyreport.google.com/safe-browsing/search?url={{domain}}">Google Web Risk</a>
+                                </div>
+                            
                             </div>
                         </div>
                     </div>
@@ -144,6 +159,7 @@
                         </div>
                     </div>
                 </div>
+                
 
                 <!-- <div class="row">
                     <div class="col-lg-4 mb-4">
