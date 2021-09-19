@@ -80,7 +80,7 @@ def viewWebsite(websiteId):
             return render_template('error/general.html', 
                 error="""
                     There was an error with loading the website scan results.
-                    If this is the first scan, please wait for around 10 seconds then try again.
+                    If this is the first scan, please wait for around 5 seconds then try again.
                     Otherwise, send an email to 'mail@endstat.com' to let us know.
                     """)
 

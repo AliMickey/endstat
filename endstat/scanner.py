@@ -2,7 +2,6 @@ import socket, threading, sys, json, datetime, requests, time, sqlite3, re
 from queue import Queue
 from threading import Thread
 from urllib.request import ssl, socket
-from pysafebrowsing import SafeBrowsing
 from flask import current_app
 from requests.api import get
 from werkzeug.security import generate_password_hash
@@ -113,6 +112,8 @@ def websiteScanner(websiteId, domain):
 
     # Run the url and port scanners
     urlScanIO(domain, logId)
+    # Wait some time for urlscan.io to process the request.
+    time.sleep(3)
     openPorts = portScan(domain)
 
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
