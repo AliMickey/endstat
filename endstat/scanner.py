@@ -49,7 +49,7 @@ def portScan(domain):
             elif result in warningPorts:
                 openPorts.append([result,warningPorts[result],'warn'])
             elif result in dangerPorts:
-                openPorts.append([result,warningPorts[result],'danger'])
+                openPorts.append([result,dangerPorts[result],'danger'])
     return openPorts
 
 # Thread to run the scan
@@ -69,15 +69,24 @@ def urlScanIOThread(uuid, logId):
     resultJson = result.json()
 
     #General
-    webServer = resultJson['page']['server']
-    ip = resultJson['page']['ip']
+    if 'server' in resultJson['page']: webServer = resultJson['page']['server']
+    else: webServer = "N/A"
+
+    if 'ip' in resultJson['page']: ip = resultJson['page']['ip']
+    else: ip = "N/A"
+
     screenshot = resultJson['task']['screenshotURL']
     generalDict = {'webServer': webServer, 'ip': ip, 'screenshot': screenshot}
 
     #SSL
-    sslStatus = resultJson['stats']['tlsStats'][0]['securityState']
-    sslExpiry = resultJson['lists']['certificates'][0]['validTo']
-    sslExpiryDaysLeft = int(re.sub("[^0-9]", "", str((datetime.datetime.now().date() - datetime.datetime.fromtimestamp(sslExpiry).date()).days)))
+    if len(resultJson['stats']['tlsStats']) > 0: sslStatus = resultJson['stats']['tlsStats'][0]['securityState']
+    else: sslStatus = "N/A"
+
+    if len(resultJson['lists']['certificates']) > 0: 
+        sslExpiry = resultJson['lists']['certificates'][0]['validTo']
+        sslExpiryDaysLeft = int(re.sub("[^0-9]", "", str((datetime.datetime.now().date() - datetime.datetime.fromtimestamp(sslExpiry).date()).days)))
+    else: sslExpiryDaysLeft = 0
+
     sslDict = {'sslStatus': sslStatus, 'sslExpiry': sslExpiryDaysLeft}
 
     #Safety
