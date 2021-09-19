@@ -54,10 +54,10 @@ def portScan(domain):
 
 # Thread to run the scan
 def urlScanIOThread(uuid, logId):
-    # Once a scan has been initiated, we wait 10 seconds for urlscan.io to have a result ready,
+    # Once a scan has been initiated, we wait 5 seconds for urlscan.io to have a result ready,
     # after that we poll every 2 seconds until we get a result. Timeout at one minute.
     db = sqlite3.connect('instance/endstat.sqlite')
-    time.sleep(10)
+    time.sleep(5)
     retries = 30
     result = requests.get(f"https://urlscan.io/api/v1/result/{uuid}/")
     while result.status_code != 200:
@@ -78,7 +78,7 @@ def urlScanIOThread(uuid, logId):
     sslStatus = resultJson['stats']['tlsStats'][0]['securityState']
     sslExpiry = resultJson['lists']['certificates'][0]['validTo']
     sslExpiryDaysLeft = (datetime.datetime.now().date() - datetime.datetime.fromtimestamp(sslExpiry).date()).days
-    sslDict = {'sslStatus': sslStatus, 'sslExpiry': re.sub("[^0-9]", "", str(sslExpiryDaysLeft))}
+    sslDict = {'sslStatus': sslStatus, 'sslExpiry': int(re.sub("[^0-9]", "", str(sslExpiryDaysLeft)))}
 
     #Safety
     malicious = resultJson['stats']['malicious']
@@ -86,7 +86,11 @@ def urlScanIOThread(uuid, logId):
     verdicts = resultJson['verdicts']['overall']['score']
     safetyDict = {'malicious': malicious, 'securePercentage': securePercentage, 'verdicts': verdicts}
 
-    db.execute('UPDATE website_log SET general = ?,ssl = ?,safety = ?  WHERE id = ?', (json.dumps(generalDict), json.dumps(sslDict), json.dumps(safetyDict), logId))
+    if sslStatus != "secure" or sslExpiryDaysLeft < 7 or malicious is True:
+        status = "Critical"
+    else: status = "Normal" 
+
+    db.execute('UPDATE website_log SET status, general = ?,ssl = ?,safety = ?  WHERE id = ?', (status, json.dumps(generalDict), json.dumps(sslDict), json.dumps(safetyDict), logId))
     db.commit()
 
 # Submit a scan request to urlscan.io, then run a thread to get the results later. Pass through db as thread will be out of app context.
@@ -109,7 +113,6 @@ def websiteScanner(websiteId, domain):
     # Run the url and port scanners
     urlScanIO(domain, logId)
     openPorts = portScan(domain)
-    print(json.dumps(openPorts))
 
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
     db.commit()
