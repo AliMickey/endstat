@@ -35,7 +35,8 @@ def portScan(domain):
     que = Queue() 
     openPorts = []
     remoteServerIP = socket.gethostbyname(domain) # Get ip for provided domain
-    for x in range(65535):
+    portsToScan = [21, 22, 23, 25, 80, 110, 139, 143, 443, 445, 1433, 1521, 3306, 3389]
+    for x in portsToScan:
         thread = Thread(target=lambda q, arg1,arg2: q.put(portScanThread(arg1,arg2)), args=(que, remoteServerIP, x))
         thread.start()
         threadsList.append(thread)
