@@ -77,8 +77,8 @@ def urlScanIOThread(uuid, logId):
     #SSL
     sslStatus = resultJson['stats']['tlsStats'][0]['securityState']
     sslExpiry = resultJson['lists']['certificates'][0]['validTo']
-    sslExpiryDaysLeft = (datetime.datetime.now().date() - datetime.datetime.fromtimestamp(sslExpiry).date()).days
-    sslDict = {'sslStatus': sslStatus, 'sslExpiry': int(re.sub("[^0-9]", "", str(sslExpiryDaysLeft)))}
+    sslExpiryDaysLeft = int(re.sub("[^0-9]", "", str((datetime.datetime.now().date() - datetime.datetime.fromtimestamp(sslExpiry).date()).days)))
+    sslDict = {'sslStatus': sslStatus, 'sslExpiry': sslExpiryDaysLeft}
 
     #Safety
     malicious = resultJson['stats']['malicious']
