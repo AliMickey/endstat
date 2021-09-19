@@ -90,7 +90,7 @@ def urlScanIOThread(uuid, logId):
         status = "Critical"
     else: status = "Normal" 
 
-    db.execute('UPDATE website_log SET status, general = ?,ssl = ?,safety = ?  WHERE id = ?', (status, json.dumps(generalDict), json.dumps(sslDict), json.dumps(safetyDict), logId))
+    db.execute('UPDATE website_log SET status = ?,general = ?,ssl = ?,safety = ?  WHERE id = ?', (status, json.dumps(generalDict), json.dumps(sslDict), json.dumps(safetyDict), logId))
     db.commit()
 
 # Submit a scan request to urlscan.io, then run a thread to get the results later. Pass through db as thread will be out of app context.
