@@ -64,6 +64,7 @@
                             </div>
                         </div>
                             <table class="table my-0" id="dataTable">
+                                <caption>Showing {{websites|length}} website/s</caption>
                                 <thead>
                                     <tr>
                                         <th>Domain</th>
@@ -108,12 +109,6 @@
                                     {% endfor %}
                                 </tbody>
                             </table>
-                            <br>
-                        <div class="row">
-                            <div class="col-md-6 align-self-center">
-                                <p id="dataTable_info" class="dataTables_info" role="status" aria-live="polite">Showing {{websites|length}} website/s</p>
-                            </div>
-                        </div>
                     </div>
                     {% if error %}
                         <div class="text-center">        
