@@ -39,7 +39,7 @@
                                     </div>
                                 </div>
 
-                                <div class="card shadow">
+                                <div class="card shadow mb-3">
                                     <div class="card-header py-3">
                                         <p class="text-primary m-0 fw-bold">Password Settings</p>
                                     </div>
@@ -66,7 +66,7 @@
                             </div>
 
                             <div class="col">
-                                <div class="card shadow">
+                                <div class="card shadow mb-3">
                                     <div class="card-header py-3">
                                         <p class="text-primary m-0 fw-bold">Notification Settings</p>
                                     </div>
@@ -93,7 +93,41 @@
                                         {% endif %}
                                     </div>
                                 </div>
+
+                                <div class="card shadow mb-3">
+                                    <div class="card-header py-3">
+                                        <p class="text-primary m-0 fw-bold">Dangerous</p>
+                                    </div>
+                                    <div class="card-body">
+                                        <form method="post">
+                                            <a class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal">Delete User</a>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Delete User Modal -->
+            <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addWebsiteLongTitle">Add Website</h5>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" id="deleteUserForm">
+                                <p>Are you sure you want to delete your account?</p>
+                                <ul class="list-group mb-3">
+                                    <li class="list-group-item active h5" aria-current="true">THE FOLLOWING WILL BE DELETED:</li>
+                                    <li class="list-group-item">All Account Details</li>
+                                    <li class="list-group-item">All Websites You Have Added</li>
+                                    <li class="list-group-item">All Scan Logs Of Those Websites</li>
+                                  </ul>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger" name="btn" value="deleteUser">Yes</button>
+                            </form>
                         </div>
                     </div>
                 </div>

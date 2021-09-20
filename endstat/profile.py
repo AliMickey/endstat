@@ -1,11 +1,13 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, session, url_for
 )
+from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
+
+# App imports
 from endstat.auth import login_required
 from endstat.db import get_db
 from endstat.notifications import sendNotification
-import datetime
 
 bp = Blueprint('profile', __name__, url_prefix='/profile')
 
@@ -91,6 +93,24 @@ def settings():
                 db.commit()
             return redirect(url_for('profile.settings'))
 
+        elif request.form["btn"] == "deleteUser":
+            # Remove all db entries related to the user
+            userId = g.user['id']
+            db.execute('DELETE FROM users WHERE id = ?', (userId,))
+            db.commit()
+            websiteDB = db.execute("SELECT id FROM websites WHERE user_id = ?", (userId,)).fetchall()
+            for website in websiteDB:
+                db.execute('DELETE FROM website_log WHERE website_id = ?', (website[0],))
+            db.execute('DELETE FROM websites WHERE user_id = ?', (userId,))
+            db.commit()
+            db.execute('DELETE FROM user_alerts WHERE user_id = ?', (userId,))
+            db.commit()
+            db.execute('DELETE FROM notification_settings WHERE user_id = ?', (userId,))
+            db.commit()
+            db.execute('DELETE FROM reset_pass WHERE user_id = ?', (userId,))
+            session.clear()
+            return redirect(url_for('main.index'))
+
     return render_template('profile/profile-settings.html', errorUser=errorUser, errorPass=errorPass, errorNotif=errorNotif, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], notifDetails=notifDetails)
 
 # View for user alerts
@@ -104,7 +124,7 @@ def alerts():
     for row in alertsDB:
         message, dateTime, type, read = row
         icon = getAlertIcon(type)
-        conv_date = datetime.datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
+        conv_date = datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
         alertsDict[message] = [conv_date, type, icon, bool(read)]
     
     if (request.method == 'POST'):

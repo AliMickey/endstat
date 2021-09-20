@@ -1,14 +1,16 @@
-from typing import Type
 from flask import (
     Blueprint, g, redirect, render_template, request, url_for, current_app
 )
-import validators, datetime, json
-from endstat.db import get_db
+import validators, json, time
+from datetime import datetime
 from werkzeug.exceptions import abort
+
+# App imports
 from endstat.auth import login_required, checkWebsiteAuthentication
+from endstat.db import get_db
 from endstat.notifications import sendNotification
-from endstat.profile import getAlertIcon
 from endstat.scanner import websiteScanner
+from endstat.scheduler import schedAddJob, schedRemoveJob
 
 bp = Blueprint('websites', __name__, url_prefix='/websites')
 
@@ -25,6 +27,7 @@ def websiteList():
             domain = request.form['domain']
             protocol = request.form.get('protocol')
 
+            # Check if website input is valid and if it exists
             if not domain or not validators.domain(domain):
                 error = "A valid URL is required"
             elif db.execute('SELECT EXISTS(SELECT 1 FROM websites WHERE user_id = ? AND domain = ?)', (g.user['id'], domain)).fetchone()[0]:
@@ -32,21 +35,25 @@ def websiteList():
 
             if error is None:
                 db.execute(
-                        'INSERT INTO websites (domain, protocol, user_id) VALUES (?, ?, ?)', 
-                            (domain, protocol, g.user['id']))
+                        'INSERT INTO websites (domain, protocol, user_id, scan_time) VALUES (?, ?, ?, ?)', 
+                            (domain, protocol, g.user['id'], datetime.now()))
                 db.commit()
-                websiteId = db.execute('SELECT id FROM websites WHERE domain = ? AND user_id = ?', (domain, g.user['id'])).fetchone()['id']
+                # Get id for newly added website
+                websiteId = db.execute('SELECT id FROM websites WHERE user_id = ? AND domain = ?', (g.user['id'], domain)).fetchone()['id']
+                # Add new job and run initial scan
+                schedAddJob(websiteId, domain)
                 websiteScanner(websiteId, domain)
                 return redirect(url_for('websites.websiteList'))
 
         elif request.form["btn"] == "deleteWebsite":
-            domainID = request.form['domainID']
-            db.execute('DELETE FROM websites WHERE id = ? AND user_id = ?', (domainID, g.user['id']))
+            websiteId = request.form['websiteId']
+            db.execute('DELETE FROM websites WHERE id = ? AND user_id = ?', (websiteId, g.user['id']))
             db.commit()
-            db.execute('DELETE FROM website_log WHERE website_id = ?', (domainID,))
+            db.execute('DELETE FROM website_log WHERE website_id = ?', (websiteId,))
             db.commit()
-            db.execute('DELETE FROM user_alerts WHERE website_id = ?', (domainID,))
+            db.execute('DELETE FROM user_alerts WHERE website_id = ?', (websiteId,))
             db.commit()
+            schedRemoveJob(websiteId)
             return redirect(url_for('websites.websiteList'))
         
     websitesDB = db.execute('SELECT domain, protocol, id FROM websites WHERE user_id = ?', (g.user['id'],)).fetchall()
@@ -69,7 +76,7 @@ def viewWebsite(websiteId):
         # Map and convert row data into dictionaries/strings
         domain = db.execute('SELECT domain FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
         try:
-            dateTime = datetime.datetime.strptime(websitesDB[0], "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
+            dateTime = datetime.strptime(websitesDB[0], "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
             status = websitesDB[1]
             general = json.loads(websitesDB[2])
             ssl = json.loads(websitesDB[3])
