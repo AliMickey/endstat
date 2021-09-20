@@ -1,10 +1,12 @@
-import socket, threading, sys, json, datetime, requests, time, sqlite3, re
+from flask import current_app
+import socket, threading, json, requests, time, sqlite3, re
+from datetime import datetime
 from queue import Queue
 from threading import Thread
-from urllib.request import ssl, socket
-from flask import current_app
+from urllib.request import socket
 from requests.api import get
-from werkzeug.security import generate_password_hash
+
+#App imports
 from endstat.db import get_db
 
 print_lock = threading.Lock()
@@ -84,7 +86,7 @@ def urlScanIOThread(uuid, logId):
 
     if len(resultJson['lists']['certificates']) > 0: 
         sslExpiry = resultJson['lists']['certificates'][0]['validTo']
-        sslExpiryDaysLeft = int(re.sub("[^0-9]", "", str((datetime.datetime.now().date() - datetime.datetime.fromtimestamp(sslExpiry).date()).days)))
+        sslExpiryDaysLeft = int(re.sub("[^0-9]", "", str((datetime.now().date() - datetime.fromtimestamp(sslExpiry).date()).days)))
     else: sslExpiryDaysLeft = 0
 
     sslDict = {'sslStatus': sslStatus, 'sslExpiry': sslExpiryDaysLeft}
@@ -114,7 +116,7 @@ def urlScanIO(domain, logId):
 def websiteScanner(websiteId, domain):
     db = get_db()
     # Make a new website log entry
-    db.execute('INSERT INTO website_log (date_time, website_id) VALUES (?, ?)', (datetime.datetime.now(), websiteId))
+    db.execute('INSERT INTO website_log (date_time, website_id) VALUES (?, ?)', (datetime.now(), websiteId))
     db.commit()
     # Select the id of the newly made log entry
     logId = db.execute('SELECT id FROM website_log WHERE website_id = ? AND id = (SELECT MAX(id) FROM website_log)', (websiteId,)).fetchone()[0]
@@ -122,7 +124,7 @@ def websiteScanner(websiteId, domain):
     # Run the url and port scanners
     urlScanIO(domain, logId)
     # Wait some time for urlscan.io to process the request.
-    time.sleep(3)
+    #time.sleep(3)
     openPorts = portScan(domain)
 
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))

@@ -1,7 +1,9 @@
 from flask import current_app
 from discord_webhook import DiscordWebhook, DiscordEmbed
-from endstat.db import get_db
 import requests
+
+# App imports
+from endstat.db import get_db
 
 # Specific email agent
 def sendEmail(email, message):

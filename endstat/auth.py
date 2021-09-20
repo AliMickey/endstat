@@ -1,8 +1,11 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, session, url_for
 )
-import functools, uuid, datetime, validators
+import functools, uuid, validators
+from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
+
+# App imports
 from endstat.db import get_db
 from endstat.notifications import sendEmail
 
@@ -56,7 +59,7 @@ def register():
             # Add first user alert
             db.execute(
                 'INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
-                    (datetime.datetime.now(), "primary", "Welcome to End Stat, we hope you enjoy it!", 0, userID))
+                    (datetime.now(), "primary", "Welcome to End Stat, we hope you enjoy it!", 0, userID))
             db.commit()
             #TEMPDISABLE sendNotification(userID, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
             return redirect(url_for('auth.login'))
@@ -96,7 +99,7 @@ def forgotPassword():
         if user is not None:
             userID = user['id']
             # Check if user has used key or has already requested for a password reset within last 24 hours
-            resetPassDetails = db.execute('SELECT reset_key, datetime(date_time), activated FROM resetPass WHERE user_id = ?', (userID,)).fetchone()
+            resetPassDetails = db.execute('SELECT reset_key, datetime(date_time), activated FROM reset_pass WHERE user_id = ?', (userID,)).fetchone()
             # Send the same key again
             if (resetPassDetails and checkPasswordResetValidity(resetPassDetails[1], resetPassDetails['activated'])):
                 resetKey = resetPassDetails['reset_key']
@@ -104,8 +107,8 @@ def forgotPassword():
             else:
                 # Generate and send a new key
                 resetKey = uuid.uuid4()
-                db.execute('INSERT INTO resetPass (reset_key, user_id, date_time, activated) VALUES (?, ?, ?, ?) ', 
-                    (str(resetKey), userID, datetime.datetime.now(), False))
+                db.execute('INSERT INTO reset_pass (reset_key, user_id, date_time, activated) VALUES (?, ?, ?, ?) ', 
+                    (str(resetKey), userID, datetime.now(), False))
                 db.commit()
             sendEmail(email, f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
         error = "If your email exists in our system, you will receive an email soon with instructions. Check your spam if you do not see it."
@@ -117,7 +120,7 @@ def forgotPassword():
 def resetPassword(resetKey):
     error = None
     db = get_db()          
-    resetPassDetails = db.execute('SELECT user_id, datetime(date_time), activated FROM resetPass WHERE reset_key = ?', (resetKey,)).fetchone()
+    resetPassDetails = db.execute('SELECT user_id, datetime(date_time), activated FROM reset_pass WHERE reset_key = ?', (resetKey,)).fetchone()
     if request.method == 'GET':
         if (resetPassDetails and checkPasswordResetValidity(resetPassDetails[1], resetPassDetails['activated'])): 
             return render_template('auth/reset-password.html', resetKey=resetKey)
@@ -139,7 +142,7 @@ def resetPassword(resetKey):
                     'UPDATE users SET password = ? WHERE id = ?',
                     (generate_password_hash(password), resetPassDetails['user_id']))
                 db.execute(
-                    'UPDATE resetPass SET activated = 1 WHERE reset_key = ?',
+                    'UPDATE reset_pass SET activated = 1 WHERE reset_key = ?',
                     (resetKey,))
                 db.commit() 
                 sendEmail(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id'],)).fetchone()[0], "Letting you know that your password was reset.")
@@ -156,8 +159,8 @@ def logout():
 
 # Function to check if reset password key is still valid       
 def checkPasswordResetValidity(genTime, activated):
-    generatedDateTime = datetime.datetime.strptime(genTime, "%Y-%m-%d %H:%M:%S")
-    nowDateTime = datetime.datetime.now()
+    generatedDateTime = datetime.strptime(genTime, "%Y-%m-%d %H:%M:%S")
+    nowDateTime = datetime.now()
     # Calculate time period between present and key generation
     diffSeconds = ((nowDateTime.hour * 60 + nowDateTime.minute) * 60 + nowDateTime.second) - ((generatedDateTime.hour * 60 + generatedDateTime.minute) * 60 + generatedDateTime.second)
     if (activated == 0 and diffSeconds < 86400):

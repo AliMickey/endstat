@@ -1,11 +1,13 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, url_for
 )
-import endstat.notifications as notif
-from endstat.db import get_db
+from datetime import datetime
+
+# App imports
 from endstat.auth import login_required
+from endstat.db import get_db
+import endstat.notifications as notif
 from endstat.profile import getAlertIcon
-import datetime
 
 bp = Blueprint('main', __name__)
 
@@ -66,7 +68,7 @@ def injectNavDetails():
         navDetailsDB = db.execute('SELECT message, datetime(date_time), type, id FROM user_alerts WHERE user_id = ? AND read = 0', (g.user['id'],)).fetchall()
         for row in navDetailsDB:
             message, dateTime, type, id = row
-            conv_date = datetime.datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
+            conv_date = datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
             icon = getAlertIcon(type)
             navDetailsDict[message] = [conv_date, icon, id]
         return dict(navDetails=navDetailsDict)
