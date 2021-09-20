@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS user_alerts;
 DROP TABLE IF EXISTS notification_settings;
-DROP TABLE IF EXISTS resetPass;
+DROP TABLE IF EXISTS reset_pass;
 DROP TABLE IF EXISTS websites;
 DROP TABLE IF EXISTS website_log;
 
@@ -34,7 +34,7 @@ CREATE TABLE notification_settings (
   FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE resetPass (
+CREATE TABLE reset_pass (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   reset_key TEXT UNIQUE NOT NULL,
   date_time TEXT NOT NULL, 
@@ -47,6 +47,7 @@ CREATE TABLE websites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   domain TEXT NOT NULL,
   protocol TEXT NOT NULL,
+  scan_time TEXT NOT NULL,
   user_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );

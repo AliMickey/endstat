@@ -1,15 +1,24 @@
-# option 1 
-# have scheduler run every 12 hours
-# check db for all websites for specific options
-# run checks on all websites at same time
-# if website is deleted, db entry removed
-#https://stackoverflow.com/questions/21214270/how-to-schedule-a-function-to-run-every-hour-on-flask
-#EASY - Server gets over loaded 
+import schedule
+from datetime import datetime
 
+# App imports
+from endstat.db import get_db
+from endstat.scanner import websiteScanner
 
-# option 2
-# store start time for each website in db
-# each time app is run, initiliase a scheduler for each website
-# scheduler will add 12 hours to start time for each website
-# if website is deleted, db entry removed and scheduler task removed from job list
-#HARDER - Load is distributed
+def schedInitJobs():
+    db = get_db()
+    # Get all websites
+    websitesDB = db.execute('SELECT id, domain, datetime(scan_time) FROM websites').fetchall()
+    # For each website, add a job to run a website scan at the specified time
+    for row in websitesDB:
+        id, domain, scanTime = row
+        convDate = datetime.strptime(scanTime, "%Y-%m-%d %H:%M:%S").time().strftime("%H:%M")
+        schedule.every().day.at(convDate).do(websiteScanner, websiteId=id, domain=domain).tag(id)
+        print(f"Website id: {id}, domain: {domain} scheduled for {convDate}")
+
+def schedAddJob(websiteId, domain):
+    schedule.every().day.at(datetime.now().strftime("%H:%M")).do(websiteScanner, websiteId=websiteId, domain=domain).tag(websiteId)
+
+def schedRemoveJob(websiteId):
+    # Remove the scheduled job for the given website by tag
+    schedule.clear(websiteId)
