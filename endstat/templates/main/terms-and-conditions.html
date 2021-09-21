@@ -1,0 +1,26 @@
+{% extends 'builders/base.html' %}
+{% set active_page = "terms" %}
+{% block title %}End Stat - Terms & Conditions{% endblock %}
+
+{% block headScripts %}
+{% endblock %}
+
+{% block content %}  
+<div class="d-flex flex-column" id="content-wrapper">
+    <div id="content">
+        <div class="container">
+            <br>
+            <h1 style="text-align: center;">Terms and Conditions</h1>
+            <p>
+                <h2>Our responsibility</h2>
+                We are NOT responsible for any downtime, financial loss or any type of loss for your website/service.
+            </p>
+        </div>
+    </div> 
+   {% include 'builders/footer.html' %}
+</div>
+{% endblock %}
+
+{% block bodyScripts %}
+    <script src="{{ url_for('static', filename='js/bs-init.js') }}"></script>
+{% endblock %} 

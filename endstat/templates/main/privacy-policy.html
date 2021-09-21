@@ -1,0 +1,47 @@
+{% extends 'builders/base.html' %}
+{% set active_page = "terms" %}
+{% block title %}End Stat - Privacy Policy{% endblock %}
+
+{% block headScripts %}
+{% endblock %}
+
+{% block content %}  
+<div class="d-flex flex-column" id="content-wrapper">
+    <div id="content">
+        <div class="container">
+            <br>
+            <h1 style="text-align: center;">Privacy Policy</h1>
+            <p>
+                <h2>What data we store</h2>
+                We (endstat) will only store information that is required to perform our website's functionality. This includes the following information: 
+                <br><br>
+                - Your username, email, hashed password, notification settings, user alerts, password reset requests, your websites, scans of those websites.
+                <br><br>
+                Upon requesting account deletion (found in user settings), all the above mentioned data will be permanently deleted.  
+
+                <br><br><br>
+                <h2>Where we store data</h2>
+                At the time of writing, endstat is deployed on Digital Ocean's droplet service. All data is stored in the Singapore data center. 
+                <br>
+                This may change in the future.
+
+                <br><br><br>
+                <h2>What we share</h2>
+                We do not share any personal user information with external services. 
+                <br><br>
+                <h4>Notifications</h4>
+                <h5>Email</h5>
+                Any notifications sent via email are relayed through SparkPost, view their privacy policy for more information.
+                <br>
+                <h5>Other</h5>
+                Any notification sent via other notification agents are subject to their respective privacy policy. 
+            </p>
+        </div>
+    </div> 
+   {% include 'builders/footer.html' %}
+</div>
+{% endblock %}
+
+{% block bodyScripts %}
+    <script src="{{ url_for('static', filename='js/bs-init.js') }}"></script>
+{% endblock %} 

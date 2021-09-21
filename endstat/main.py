@@ -14,7 +14,7 @@ bp = Blueprint('main', __name__)
 # Main view for website information
 @bp.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('main/index.html')
 
 # View for user dashboard
 @bp.route('/dashboard')
@@ -34,19 +34,17 @@ def dashboard():
     #     conv_date = datetime.datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
     #     dashboardDict[message] = [conv_date, type, icon]
 
-    return render_template('dashboard.html')
+    return render_template('main/dashboard.html')
 
 # View for privacy policy
 @bp.route('/privacy-policy')
-@login_required
 def privacyPolicy():
-    return render_template('privacy-policy.html')
+    return render_template('main/privacy-policy.html')
 
 # View for terms and conditions
 @bp.route('/terms-and-conditions')
-@login_required
 def termsAndConditions():
-    return render_template('terms-and-conditions.html')
+    return render_template('main/terms-and-conditions.html')
 
 # 404 page not found error
 @bp.app_errorhandler(404)
