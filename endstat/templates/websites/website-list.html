@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'builders/base.html' %}
 {% set active_page = "Websites" %}
 {% block title %}End Stat - Websites{% endblock %}
 
@@ -44,13 +44,24 @@
             }
         });
     </script>
+    <script>
+        function formatAddWebsite(input) {
+            // For manual type
+            var finalLine = input
+            // For direct copy paste from browser
+            if (input.includes("https") || input.includes("http")) {
+                var finalLine = input.replace(/https?:\/\//gi,'');
+            }
+            document.getElementById('addWebsiteInputText').value = finalLine;
+        }
+     </script>
 {% endblock %}
 
 {% block content %}  
     <div class="d-flex flex-column" id="content-wrapper">
         <div id="content">
             
-            {% include 'topNav.html' %}
+            {% include 'builders/topNav.html' %}
 
             <div class="container-fluid">
                 <div class="card shadow">
@@ -68,7 +79,7 @@
                                 <thead>
                                     <tr>
                                         <th>Domain</th>
-                                        <th>Protocol</th>
+                                        <th>Secure</th>
                                         <th>More Info</th>
                                     </tr>
                                 </thead>
@@ -76,11 +87,12 @@
                                     {% for domain,details in websites.items() %}
                                     <tr>
                                         <td>{{domain}}</td>
-                                        <td> {{details[1]}}
+                                        <!-- <td> {{details[1]}}
                                             {% if details[1] == 'https' %}  
                                                 <i class="fa fa-lock"></i>
                                             {% endif %}
-                                        </td>
+                                        </td> -->
+                                        <td>Secure</td>
                                         <td>
                                             <a class="btn btn-primary btn-sm" href="{{ url_for('websites.viewWebsite', websiteId=details[0]) }}"><i class="fas fa-add fa-sm text-white-50"></i>View</a>
                                             <a class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteWebsiteModal-{{details[0]}}"><i class="fas fa-add fa-sm text-white-50"></i>Delete</a>
@@ -119,7 +131,7 @@
             </div>
             <!-- Add Website Modal -->
             <div class="modal fade" id="addWebsiteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-dialog modal-dialog-centered modal-lg-10" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="addWebsiteLongTitle">Add Website</h5>
@@ -127,12 +139,8 @@
                         <div class="modal-body">
                             <form method="post" id="addWebsiteForm">
                                 <div class="row mb-3">
-                                    <div class="col-sm-2"><select class="form-select" name="protocol">
-                                        <option value="https" selected>https://</option>
-                                        <option value="http">http://</option>
-                                    </select></div>
-                                    <div class="col-sm-10">
-                                        <input class="form-control form-control-user" type="text" id="addWebsiteInputText" aria-describedby="textHelp" placeholder="endstat.com (Root Domain Only)" name="domain" required>
+                                    <div class="col-lg-12">
+                                        <input class="form-control form-control-user" type="text" id="addWebsiteInputText" aria-describedby="textHelp" placeholder="endstat.com (Root Domain Only)" name="domain" onChange="formatAddWebsite(this.value)" required>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -146,7 +154,7 @@
                 </div>
             </div>
         </div> 
-        {% include 'footer.html' %}
+        {% include 'builders/footer.html' %}
     </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
 {% endblock %}
 
