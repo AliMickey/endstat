@@ -25,18 +25,19 @@ def websiteList():
     if request.method == 'POST':
         if request.form["btn"] == "addWebsite":
             domain = request.form['domain']
-            protocol = request.form.get('protocol')
 
             # Check if website input is valid and if it exists
             if not domain or not validators.domain(domain):
-                error = "A valid URL is required"
+                error = "A valid domain is required. Do not include https or any trailing paths."
             elif db.execute('SELECT EXISTS(SELECT 1 FROM websites WHERE user_id = ? AND domain = ?)', (g.user['id'], domain)).fetchone()[0]:
                 error = "This website already exists."
+            elif db.execute('SELECT Count(id) FROM websites WHERE user_id = ?', (g.user['id'],)).fetchone()[0] == 5:
+                error = "You have reached your 5 website limit. Either delete some websites or upgrade your account to premium."
 
             if error is None:
                 db.execute(
-                        'INSERT INTO websites (domain, protocol, user_id, scan_time) VALUES (?, ?, ?, ?)', 
-                            (domain, protocol, g.user['id'], datetime.now()))
+                        'INSERT INTO websites (domain, user_id, scan_time) VALUES (?, ?, ?)', 
+                            (domain, g.user['id'], datetime.now()))
                 db.commit()
                 # Get id for newly added website
                 websiteId = db.execute('SELECT id FROM websites WHERE user_id = ? AND domain = ?', (g.user['id'], domain)).fetchone()['id']
@@ -56,10 +57,10 @@ def websiteList():
             schedRemoveJob(websiteId)
             return redirect(url_for('websites.websiteList'))
         
-    websitesDB = db.execute('SELECT domain, protocol, id FROM websites WHERE user_id = ?', (g.user['id'],)).fetchall()
+    websitesDB = db.execute('SELECT domain, id FROM websites WHERE user_id = ?', (g.user['id'],)).fetchall()
     for row in websitesDB:
-        domain, protocol, id = row
-        websiteDict[domain] = [id, protocol]
+        domain, id = row
+        websiteDict[domain] = [id]
         
     return render_template('websites/website-list.html', error=error, websites=websiteDict)
 

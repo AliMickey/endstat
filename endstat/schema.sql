@@ -46,7 +46,6 @@ CREATE TABLE reset_pass (
 CREATE TABLE websites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   domain TEXT NOT NULL,
-  protocol TEXT NOT NULL,
   scan_time TEXT NOT NULL,
   user_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users (id)
