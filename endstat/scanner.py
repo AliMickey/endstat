@@ -108,9 +108,13 @@ def urlScanIOThread(uuid, logId):
 def urlScanIO(domain, logId):
     headers = {'API-Key':f'{current_app.config["URLIO_API"]}','Content-Type':'application/json'}
     data = {"url": f"{domain}", "visibility": "public"}
-    uuid = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data)).json()['uuid']
-    thread = Thread(target=urlScanIOThread, args=(uuid, logId))
-    thread.start()
+    request = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data)).json()
+    try:
+        uuid = request['uuid']
+        thread = Thread(target=urlScanIOThread, args=(uuid, logId))
+        thread.start()
+    except KeyError as e:
+        print(e)
 
 # Add all results to dict and return
 def websiteScanner(websiteId, domain):
@@ -124,7 +128,7 @@ def websiteScanner(websiteId, domain):
     # Run the url and port scanners
     urlScanIO(domain, logId)
     # Wait some time for urlscan.io to process the request.
-    #time.sleep(3)
+    time.sleep(3)
     openPorts = portScan(domain)
 
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
