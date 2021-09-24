@@ -8,6 +8,7 @@ from requests.api import get
 
 #App imports
 from endstat.db import get_db
+from endstat.notifications import sendNotification
 
 print_lock = threading.Lock()
 socket.setdefaulttimeout(0.2)
@@ -133,3 +134,6 @@ def websiteScanner(websiteId, domain):
 
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
     db.commit()
+
+    userId = db.execute('SELECT user_id FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
+    sendNotification(userId, f"Scan completed for {domain}.\nView it at https://endstat.com/websites/view/{websiteId}")
