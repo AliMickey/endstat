@@ -1,19 +1,26 @@
 from flask import current_app
+import smtplib
 from discord_webhook import DiscordWebhook, DiscordEmbed
-import requests
+from email.mime.text import MIMEText
+from email.header import Header
+from email.utils import formataddr
 
 # App imports
 from endstat.db import get_db
 
 # Specific email agent
-def sendEmail(email, message):
-	return requests.post(
-			"https://api.mailgun.net/v3/endstat.com/messages",
-			auth=("api", current_app.config['MAILGUN_API']),
-			data={"from": "End Stat <info@endstat.com>",
-				"to": email,
-				"subject": "End Stat Alert",
-				"text": message})
+def sendEmail(recipient, message):
+	msg = MIMEText(message, 'plain', 'utf-8')
+	msg['Subject'] =  Header("End Stat Alert", 'utf-8')
+	msg['From'] = formataddr((str(Header("End Stat", 'utf-8')), "endstat@mickit.net"))
+	msg['To'] = recipient
+
+	server = smtplib.SMTP_SSL('smtp.zoho.com.au', 465)
+
+	server.login('endstat@mickit.net', current_app.config['ZOHO_API'])
+	server.sendmail("endstat@mickit.net", [recipient], msg.as_string())
+	server.quit()
+
 
 # General wrapper to send notifications to enabled agents for the user
 def sendNotification(userID, message):

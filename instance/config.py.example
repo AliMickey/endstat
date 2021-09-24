@@ -1,6 +1,6 @@
 DATABASE = "endstat.sqlite"
 SERVER_NAME = "domain.com"
 SECRET_KEY = "dev"
-MAILGUN_API = ""
+ZOHO_API = ""
 DISCORD_WEBHOOK = ""
 URLIO_API = ""
