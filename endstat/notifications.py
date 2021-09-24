@@ -16,7 +16,6 @@ def sendEmail(recipient, message):
 	msg['To'] = recipient
 
 	server = smtplib.SMTP_SSL('smtp.zoho.com.au', 465)
-
 	server.login('endstat@mickit.net', current_app.config['ZOHO_API'])
 	server.sendmail("endstat@mickit.net", [recipient], msg.as_string())
 	server.quit()
@@ -32,7 +31,5 @@ def sendNotification(userID, message):
 		sendEmail(notifications['email'], message)
 		
 	if (notifications['discord_enabled'] and notifications['discord']):
-		discordWebhook = DiscordWebhook(url=notifications['discord'])
-		embed = DiscordEmbed(title="End Stat Alert", description=message, color=242424)
-		discordWebhook.add_embed(embed).execute()
+		discordWebhook = DiscordWebhook(url=notifications['discord'], content=message)
 		response = discordWebhook.execute()
