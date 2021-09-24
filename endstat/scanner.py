@@ -13,9 +13,9 @@ from endstat.notifications import sendNotification
 print_lock = threading.Lock()
 socket.setdefaulttimeout(0.2)
 
-safePorts = {80: 'http', 443: 'https'}
-warningPorts = {20: 'ftp'}
-dangerPorts = {22: 'ssh'}
+scanPorts = { 20: ['ftp', 'warn'], 21: ['ftp', 'warn'], 22: ['ssh', 'danger'], 23: ['telnet', 'warn'], 25: ['smtp', 'warn'], 80: ['http', 'safe'], 
+    110: ['pop', 'warn'], 139: ['smb', 'danger'], 443: ['https', 'safe'], 445: ['smb', 'danger'], 1433: ['MSSQL', 'danger'], 
+    1521: ['Oracle DB', 'danger'], 3306: ['MySQL', 'danger'], 3389: ['RDP', 'danger'] }
 
 # Open port scanner
 def portScanThread(ip, port):
@@ -37,9 +37,8 @@ def portScan(domain):
     que = Queue() 
     openPorts = []
     remoteServerIP = socket.gethostbyname(domain) # Get ip for provided domain
-    portsToScan = [21, 22, 23, 25, 80, 110, 139, 143, 443, 445, 1433, 1521, 3306, 3389]
-    for x in portsToScan:
-        thread = Thread(target=lambda q, arg1,arg2: q.put(portScanThread(arg1,arg2)), args=(que, remoteServerIP, x))
+    for port, details in scanPorts.items():
+        thread = Thread(target=lambda q, arg1,arg2: q.put(portScanThread(arg1,arg2)), args=(que, remoteServerIP, port))
         thread.start()
         threadsList.append(thread)
     for t in threadsList:
@@ -47,12 +46,7 @@ def portScan(domain):
     while not que.empty():
         result = que.get()
         if result is not None:
-            if result in safePorts:
-                openPorts.append([result,safePorts[result],'safe'])
-            elif result in warningPorts:
-                openPorts.append([result,warningPorts[result],'warn'])
-            elif result in dangerPorts:
-                openPorts.append([result,dangerPorts[result],'danger'])
+            openPorts.append([port,details[0],details[1]])
     return openPorts
 
 # Thread to run the scan
@@ -61,7 +55,7 @@ def urlScanIOThread(uuid, logId):
     # after that we poll every 2 seconds until we get a result. Timeout at one minute.
     db = sqlite3.connect('instance/endstat.sqlite')
     time.sleep(5)
-    retries = 30
+    retries = 15
     result = requests.get(f"https://urlscan.io/api/v1/result/{uuid}/")
     while result.status_code != 200:
         time.sleep(2)
@@ -129,7 +123,7 @@ def websiteScanner(websiteId, domain):
     # Run the url and port scanners
     urlScanIO(domain, logId)
     # Wait some time for urlscan.io to process the request.
-    time.sleep(3)
+    time.sleep(2)
     openPorts = portScan(domain)
 
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
