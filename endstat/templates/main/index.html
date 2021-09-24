@@ -9,54 +9,52 @@
 
 {% block content %}  
 <div class="d-flex flex-column" id="content-wrapper">
-    <div id="content">
-        <section class="features-boxed">
-            <div class="container">
-                <div class="intro">
-                    <h2 class="text-center">End Stat</h2>
-                    <p class="text-center">An open-source platform to facilitate endpoint status monitoring.</p>
+    <div id="content" class="features-boxed">
+        <div class="container">
+            <div class="intro">
+                <h2 class="text-center">End Stat</h2>
+                <p class="text-center">An open-source platform to facilitate endpoint status monitoring.</p>
+            </div>
+            <div class="row justify-content-center features">
+                <div class="col-sm-6 col-md-5 col-lg-4 item">
+                    <div class="box"><i class="fa fa-certificate icon"></i>
+                        <h3 class="name">Website</h3>
+                        <p class="description">Check for any certificate issues with websites</p>
+                    </div>
                 </div>
-                <div class="row justify-content-center features">
-                    <div class="col-sm-6 col-md-5 col-lg-4 item">
-                        <div class="box"><i class="fa fa-certificate icon"></i>
-                            <h3 class="name">Website</h3>
-                            <p class="description">Check for any certificate issues with websites</p>
-                        </div>
+                <div class="col-sm-6 col-md-5 col-lg-4 item">
+                    <div class="box"><i class="fa fa-lock icon"></i>
+                        <h3 class="name">Hosting</h3>
+                        <p class="description">Check for open ports or incorrect configuration</p>
                     </div>
-                    <div class="col-sm-6 col-md-5 col-lg-4 item">
-                        <div class="box"><i class="fa fa-lock icon"></i>
-                            <h3 class="name">Hosting</h3>
-                            <p class="description">Check for open ports or incorrect configuration</p>
-                        </div>
+                </div>
+                <div class="col-sm-6 col-md-5 col-lg-4 item">
+                    <div class="box"><i class="fa fa-list-alt icon"></i>
+                        <h3 class="name">Safety Analysis</h3>
+                        <p class="description">Check if a website is listed on a blacklist</p>
                     </div>
-                    <div class="col-sm-6 col-md-5 col-lg-4 item">
-                        <div class="box"><i class="fa fa-list-alt icon"></i>
-                            <h3 class="name">Safety Analysis</h3>
-                            <p class="description">Check if a website is listed on a blacklist</p>
-                        </div>
+                </div>
+                <div class="col-sm-6 col-md-5 col-lg-4 item">
+                    <div class="box"><i class="fa fa-search icon"></i>
+                        <h3 class="name">Constant Monitoring</h3>
+                        <p class="description">All endpoints will be continuously monitored</p>
                     </div>
-                    <div class="col-sm-6 col-md-5 col-lg-4 item">
-                        <div class="box"><i class="fa fa-search icon"></i>
-                            <h3 class="name">Constant Monitoring</h3>
-                            <p class="description">All endpoints will be continuously monitored</p>
-                        </div>
+                </div>
+                <div class="col-sm-6 col-md-5 col-lg-4 item">
+                    <div class="box"><i class="fa fa-bell icon"></i>
+                        <h3 class="name">Alerting</h3>
+                        <p class="description">Automated notifications for any type of issue</p>
                     </div>
-                    <div class="col-sm-6 col-md-5 col-lg-4 item">
-                        <div class="box"><i class="fa fa-bell icon"></i>
-                            <h3 class="name">Alerting</h3>
-                            <p class="description">Automated notifications for any type of issue</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-5 col-lg-4 item">
-                        <div class="box"><i class="fa fa-code icon"></i>
-                            <h3 class="name">Open-Source</h3>
-                            <p class="description">Entire server code is available at <a class="learn-more" href="https://github.com/AliMickey/endstat">Github</a></p>
-                        </div>
+                </div>
+                <div class="col-sm-6 col-md-5 col-lg-4 item">
+                    <div class="box"><i class="fa fa-code icon"></i>
+                        <h3 class="name">Open-Source</h3>
+                        <p class="description">Entire server code is available at <a class="learn-more" href="https://github.com/AliMickey/endstat">Github</a></p>
                     </div>
                 </div>
             </div>
-        </section>
-    </div> 
+        </div>
+    </div>
    {% include 'builders/footer.html' %}
 </div>
 {% endblock %}
