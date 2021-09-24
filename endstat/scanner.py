@@ -37,7 +37,7 @@ def portScan(domain):
     que = Queue() 
     openPorts = []
     remoteServerIP = socket.gethostbyname(domain) # Get ip for provided domain
-    for port, details in scanPorts.items():
+    for port in scanPorts:
         thread = Thread(target=lambda q, arg1,arg2: q.put(portScanThread(arg1,arg2)), args=(que, remoteServerIP, port))
         thread.start()
         threadsList.append(thread)
@@ -46,7 +46,8 @@ def portScan(domain):
     while not que.empty():
         result = que.get()
         if result is not None:
-            openPorts.append([port,details[0],details[1]])
+            portDict = scanPorts[result]
+            openPorts.append([result, portDict[0], portDict[1]])
     return openPorts
 
 # Thread to run the scan
@@ -130,4 +131,4 @@ def websiteScanner(websiteId, domain):
     db.commit()
 
     userId = db.execute('SELECT user_id FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
-    sendNotification(userId, f"Scan completed for {domain}.\nView it at https://endstat.com/websites/view/{websiteId}")
+    #sendNotification(userId, f"Scan completed for {domain}.\nView it at https://endstat.com/websites/view/{websiteId}")
