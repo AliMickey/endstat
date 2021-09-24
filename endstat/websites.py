@@ -77,7 +77,7 @@ def viewWebsite(websiteId):
         # Map and convert row data into dictionaries/strings
         domain = db.execute('SELECT domain FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
         try:
-            dateTime = datetime.strptime(websitesDB[0], "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
+            dateTime = datetime.strptime(websitesDB[0], "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M")
             status = websitesDB[1]
             general = json.loads(websitesDB[2])
             ssl = json.loads(websitesDB[3])

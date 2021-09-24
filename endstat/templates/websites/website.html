@@ -1,5 +1,5 @@
 {% extends 'builders/base.html' %}
-{% set active_page = domain ~ ' | Scanned: ' ~ dateTime %}
+{% set active_page = domain %}
 {% block title %}End Stat - {{domain}} {% endblock %}
 
 {% block headScripts %}
@@ -20,6 +20,19 @@
                             <div class="card-body">
                                 <div class="row align-items-center no-gutters">
                                     <div class="col me-2">
+                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Scan Date/Time</span></div>
+                                        <div class="text-dark fw-bold h5 mb-0"><span>{{dateTime}}</span></div>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-clock fa-2x text-gray-300"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-2 mb-4">
+                        <div class="card shadow border-start-primary py-2">
+                            <div class="card-body">
+                                <div class="row align-items-center no-gutters">
+                                    <div class="col me-2">
                                         <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Status</span></div>
                                         <div class="text-dark fw-bold h5 mb-0"><span>{{status}}</span></div>
                                     </div>
@@ -28,7 +41,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="col-md-6 col-xl-2 mb-4">
                         <div class="card shadow border-start-success py-2">
                             <div class="card-body">
                                 <div class="row align-items-center no-gutters">
@@ -41,7 +54,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="col-md-6 col-xl-2 mb-4">
                         <div class="card shadow border-start-info py-2">
                             <div class="card-body">
                                 <div class="row align-items-center no-gutters">
