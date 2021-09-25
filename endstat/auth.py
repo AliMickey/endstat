@@ -48,7 +48,7 @@ def register():
         if error is None:
             # Create user
             db.execute(
-                'INSERT INTO users (first_name, email, password) VALUES (?, ?, ?)', (first_name, email, generate_password_hash(password)))
+                'INSERT INTO users (first_name, email, password, time_zone) VALUES (?, ?, ?, ?)', (first_name, email, generate_password_hash(password), "Australia/Sydney"))
             db.commit()
             userID = int(db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone()[0])
             # Add default notification settings
@@ -61,7 +61,7 @@ def register():
                 'INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
                     (datetime.now(), "primary", "Welcome to End Stat, we hope you enjoy it!", 0, userID))
             db.commit()
-            #TEMPDISABLE sendNotification(userID, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you havn't already!")
+            #TEMPDISABLE sendNotification(userID, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you haven't already!")
             return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', error=error)

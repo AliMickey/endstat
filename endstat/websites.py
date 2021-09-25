@@ -1,8 +1,8 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, url_for, current_app
 )
-import validators, json, time
-from datetime import datetime
+import validators, json, time, pytz
+from datetime import datetime, timezone
 from werkzeug.exceptions import abort
 
 # App imports
@@ -37,7 +37,7 @@ def websiteList():
             if error is None:
                 db.execute(
                         'INSERT INTO websites (domain, user_id, scan_time) VALUES (?, ?, ?)', 
-                            (domain, g.user['id'], datetime.now()))
+                            (domain, g.user['id'], datetime.utcnow()))
                 db.commit()
                 # Get id for newly added website
                 websiteId = db.execute('SELECT id FROM websites WHERE user_id = ? AND domain = ?', (g.user['id'], domain)).fetchone()['id']
@@ -76,8 +76,14 @@ def viewWebsite(websiteId):
 
         # Map and convert row data into dictionaries/strings
         domain = db.execute('SELECT domain FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
+        userTimeZone = db.execute('SELECT time_zone FROM users WHERE id = ?', (g.user['id'],)).fetchone()[0]
+        utcDateTime = datetime.strptime(websitesDB[0], "%Y-%m-%d %H:%M:%S")
         try:
-            dateTime = datetime.strptime(websitesDB[0], "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M")
+            convDateTime = pytz.timezone("UTC").localize(utcDateTime).astimezone(pytz.timezone(userTimeZone))
+        except pytz.UnknownTimeZoneError as e:
+            convDateTime = utcDateTime
+        dateTime = convDateTime.strftime("%d/%m/%Y %H:%M")
+        try:
             status = websitesDB[1]
             general = json.loads(websitesDB[2])
             ssl = json.loads(websitesDB[3])
@@ -89,7 +95,7 @@ def viewWebsite(websiteId):
                 error="""
                     There was an error with loading the website scan results.
                     If this is the first scan, please wait for around 5 seconds then try again.
-                    Otherwise, send an email to 'mail@endstat.com' to let us know.
+                    Otherwise, send an email to 'endstat@mickit.net' to let us know.
                     """)
 
         return render_template('websites/website.html', domain=domain, dateTime=dateTime, status=status, general=general, ssl=ssl, safety=safety, ports=ports) 

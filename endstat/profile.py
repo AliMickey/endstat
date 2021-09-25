@@ -19,7 +19,7 @@ def settings():
     errorPass = None
     errorNotif = None
     db = get_db()  
-    userDetails = db.execute('SELECT first_name, password, email FROM users WHERE id = ?', (g.user['id'],)).fetchone()
+    userDetails = db.execute('SELECT first_name, password, email, time_zone FROM users WHERE id = ?', (g.user['id'],)).fetchone()
     notifDetails = db.execute('SELECT email, discord, email_enabled, discord_enabled FROM notification_settings WHERE user_id = ?', 
         (g.user['id'],)).fetchone()
 
@@ -27,23 +27,28 @@ def settings():
         if request.form["btn"] == "user":
             first_name = request.form['first_name']
             email = request.form['email']
+            timeZone = request.form['time_zone']
 
             if (first_name and first_name is userDetails['first_name']):
                 errorUser = "Your new name cannot be the same as your existing one."
             elif (email and email is userDetails['email']):
                 errorUser = "Your new email cannot be the same as your existing one."
+            elif (timeZone and timeZone is userDetails['time_zone']):
+                errorUser = "Your new time zone cannot be the same as your existing one."
 
             if errorUser is None:
                 if (first_name):
                     db.execute('UPDATE users SET first_name = ? WHERE id = ?', (first_name, g.user['id']))
                     db.commit()
-                    return redirect(url_for('profile.settings'))
-                if (email and email is not userDetails['email']):
+                if (email):
                     db.execute('UPDATE users SET email = ? WHERE id = ?', (email, g.user['id']))
                     db.commit()
                     sendNotification(g.user['id'], f"Letting you know that your email was changed to '{email}'")
                     session.clear()
-                    return redirect(url_for('auth.login'))
+                if (timeZone):
+                    db.execute('UPDATE users SET time_zone = ? WHERE id = ?', (timeZone, g.user['id']))
+                    db.commit()
+                return redirect(url_for('profile.settings'))
 
         elif request.form["btn"] == "password":
             current_password = request.form['current_password']
@@ -111,7 +116,7 @@ def settings():
             session.clear()
             return redirect(url_for('main.index'))
 
-    return render_template('profile/profile-settings.html', errorUser=errorUser, errorPass=errorPass, errorNotif=errorNotif, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], notifDetails=notifDetails)
+    return render_template('profile/profile-settings.html', errorUser=errorUser, errorPass=errorPass, errorNotif=errorNotif, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], currentTZone=userDetails['time_zone'], notifDetails=notifDetails)
 
 # View for user alerts
 @bp.route('/alerts', methods=('GET', 'POST'))
