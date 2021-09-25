@@ -54,8 +54,8 @@ def portScan(domain):
 def urlScanIOThread(uuid, logId):
     # Once a scan has been initiated, we wait 5 seconds for urlscan.io to have a result ready,
     # after that we poll every 2 seconds until we get a result. Timeout at one minute.
-    db = sqlite3.connect('instance/endstat.sqlite')
     time.sleep(5)
+    db = sqlite3.connect('instance/endstat.sqlite')
     retries = 15
     result = requests.get(f"https://urlscan.io/api/v1/result/{uuid}/")
     while result.status_code != 200:
@@ -103,8 +103,11 @@ def urlScanIOThread(uuid, logId):
 # Submit a scan request to urlscan.io, then run a thread to get the results later. Pass through db as thread will be out of app context.
 def urlScanIO(domain, logId):
     headers = {'API-Key':f'{current_app.config["URLIO_API"]}','Content-Type':'application/json'}
-    data = {"url": f"{domain}", "visibility": "public"}
+    data = {"url": f"{domain}", "visibility": "unlisted"}
     request = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data)).json()
+    if 'status' in request and request['status'] == 400:
+        print(f"Blacklist prevented scan for {domain}")
+        return None
     try:
         uuid = request['uuid']
         thread = Thread(target=urlScanIOThread, args=(uuid, logId))
@@ -116,7 +119,7 @@ def urlScanIO(domain, logId):
 def websiteScanner(websiteId, domain):
     db = get_db()
     # Make a new website log entry
-    db.execute('INSERT INTO website_log (date_time, website_id) VALUES (?, ?)', (datetime.now(), websiteId))
+    db.execute('INSERT INTO website_log (date_time, website_id) VALUES (?, ?)', (datetime.utcnow(), websiteId))
     db.commit()
     # Select the id of the newly made log entry
     logId = db.execute('SELECT id FROM website_log WHERE website_id = ? AND id = (SELECT MAX(id) FROM website_log)', (websiteId,)).fetchone()[0]
