@@ -1,6 +1,6 @@
 from flask import current_app
 import smtplib
-from discord_webhook import DiscordWebhook, DiscordEmbed
+from discord_webhook import DiscordWebhook
 from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
