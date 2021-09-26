@@ -8,6 +8,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from endstat.auth import login_required
 from endstat.db import get_db
 from endstat.notifications import sendNotification
+from endstat.websites import convertToUserTime
 
 bp = Blueprint('profile', __name__, url_prefix='/profile')
 
@@ -129,8 +130,8 @@ def alerts():
     for row in alertsDB:
         message, dateTime, type, read = row
         icon = getAlertIcon(type)
-        conv_date = datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
-        alertsDict[message] = [conv_date, type, icon, bool(read)]
+        convDate = convertToUserTime(dateTime)
+        alertsDict[message] = [convDate, type, icon, bool(read)]
     
     if (request.method == 'POST'):
         db.execute('UPDATE user_alerts SET read = 1 WHERE id = ?', (request.form['read'],))

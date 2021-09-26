@@ -1,4 +1,5 @@
-from flask import current_app
+from io import DEFAULT_BUFFER_SIZE
+from flask import current_app, g
 import socket, threading, json, requests, time, sqlite3, re
 from datetime import datetime
 from queue import Queue
@@ -33,6 +34,7 @@ def portScanThread(ip, port):
 
 # Return all open ports on domain with multi-threading
 def portScan(domain):
+    db = get_db()
     threadsList = list()
     que = Queue() 
     openPorts = []
@@ -48,10 +50,15 @@ def portScan(domain):
         if result is not None:
             portDict = scanPorts[result]
             openPorts.append([result, portDict[0], portDict[1]])
+            if portDict[1] == "danger":
+                db.execute('INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
+                    (datetime.utcnow(), "danger", f"Open port detected on {domain}", 0, g.user['id']))
+                db.commit()
+
     return openPorts
 
 # Thread to run the scan
-def urlScanIOThread(uuid, logId):
+def urlScanIOThread(uuid, logId, userId):
     # Once a scan has been initiated, we wait 5 seconds for urlscan.io to have a result ready,
     # after that we poll every 2 seconds until we get a result. Timeout at one minute.
     time.sleep(5)
@@ -82,7 +89,7 @@ def urlScanIOThread(uuid, logId):
 
     if len(resultJson['lists']['certificates']) > 0: 
         sslExpiry = resultJson['lists']['certificates'][0]['validTo']
-        sslExpiryDaysLeft = int(re.sub("[^0-9]", "", str((datetime.now().date() - datetime.fromtimestamp(sslExpiry).date()).days)))
+        sslExpiryDaysLeft = int(re.sub("[^0-9]", "", str((datetime.utcnow().date() - datetime.fromtimestamp(sslExpiry).date()).days)))
     else: sslExpiryDaysLeft = 0
 
     sslDict = {'sslStatus': sslStatus, 'sslExpiry': sslExpiryDaysLeft}
@@ -95,6 +102,10 @@ def urlScanIOThread(uuid, logId):
 
     if sslStatus != "secure" or sslExpiryDaysLeft < 7 or malicious is True:
         status = "Critical"
+        db.execute(
+            'INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
+                (datetime.utcnow(), "danger", f"A recent scan has resulted in a critical result", 0, userId))
+        db.commit()
     else: status = "Normal" 
 
     db.execute('UPDATE website_log SET status = ?,general = ?,ssl = ?,safety = ?  WHERE id = ?', (status, json.dumps(generalDict), json.dumps(sslDict), json.dumps(safetyDict), logId))
@@ -110,7 +121,7 @@ def urlScanIO(domain, logId):
         return None
     try:
         uuid = request['uuid']
-        thread = Thread(target=urlScanIOThread, args=(uuid, logId))
+        thread = Thread(target=urlScanIOThread, args=(uuid, logId, g.user['id']))
         thread.start()
     except KeyError as e:
         print(e)

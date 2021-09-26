@@ -60,8 +60,10 @@ def websiteList():
     websitesDB = db.execute('SELECT domain, id FROM websites WHERE user_id = ?', (g.user['id'],)).fetchall()
     for row in websitesDB:
         domain, id = row
-        websiteDict[domain] = [id]
-        
+        websiteLog = db.execute('SELECT datetime(date_time), status FROM website_log WHERE id = (SELECT MAX(id) FROM website_log WHERE website_id = ?)', (int(id),)).fetchone()
+        dateTime = convertToUserTime(websiteLog[0])
+        websiteDict[domain] = [id, dateTime, websiteLog[1]]
+    
     return render_template('websites/website-list.html', error=error, websites=websiteDict)
 
 # View for viewing website specific logs
@@ -76,13 +78,7 @@ def viewWebsite(websiteId):
 
         # Map and convert row data into dictionaries/strings
         domain = db.execute('SELECT domain FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
-        userTimeZone = db.execute('SELECT time_zone FROM users WHERE id = ?', (g.user['id'],)).fetchone()[0]
-        utcDateTime = datetime.strptime(websitesDB[0], "%Y-%m-%d %H:%M:%S")
-        try:
-            convDateTime = pytz.timezone("UTC").localize(utcDateTime).astimezone(pytz.timezone(userTimeZone))
-        except pytz.UnknownTimeZoneError as e:
-            convDateTime = utcDateTime
-        dateTime = convDateTime.strftime("%d/%m/%Y %H:%M")
+        dateTime = convertToUserTime(websitesDB[0])
         try:
             status = websitesDB[1]
             general = json.loads(websitesDB[2])
@@ -108,3 +104,15 @@ def viewWebsite(websiteId):
 @login_required
 def websiteSettings(websiteId):
     db = get_db()
+
+# Convert db utc time to local user settings timezone
+def convertToUserTime(dateTime):
+    db = get_db()
+    userTimeZone = db.execute('SELECT time_zone FROM users WHERE id = ?', (g.user['id'],)).fetchone()[0]
+    utcDateTime = datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S")
+    try:
+        convDateTime = pytz.timezone("UTC").localize(utcDateTime).astimezone(pytz.timezone(userTimeZone))
+    except pytz.UnknownTimeZoneError as e:
+        convDateTime = utcDateTime
+    convDate = convDateTime.strftime("%d/%m/%Y %H:%M")
+    return convDate
