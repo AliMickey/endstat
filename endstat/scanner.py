@@ -1,5 +1,5 @@
 from io import DEFAULT_BUFFER_SIZE
-from flask import current_app, g
+from flask import current_app
 import socket, threading, json, requests, time, sqlite3, re
 from datetime import datetime
 from queue import Queue
@@ -8,8 +8,8 @@ from urllib.request import socket
 from requests.api import get
 
 #App imports
-from endstat.db import get_db
 from endstat.notifications import sendNotification
+from endstat.profile import addAlert
 
 print_lock = threading.Lock()
 socket.setdefaulttimeout(0.2)
@@ -33,8 +33,7 @@ def portScanThread(ip, port):
         return None
 
 # Return all open ports on domain with multi-threading
-def portScan(domain):
-    db = get_db()
+def portScan(domain, userId):
     threadsList = list()
     que = Queue() 
     openPorts = []
@@ -51,10 +50,7 @@ def portScan(domain):
             portDict = scanPorts[result]
             openPorts.append([result, portDict[0], portDict[1]])
             if portDict[1] == "danger":
-                db.execute('INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
-                    (datetime.utcnow(), "danger", f"Open port detected on {domain}", 0, g.user['id']))
-                db.commit()
-
+                addAlert(userId, "danger", f"Port '{result}' was detected as open on {domain}.")
     return openPorts
 
 # Thread to run the scan
@@ -102,17 +98,14 @@ def urlScanIOThread(uuid, logId, userId):
 
     if sslStatus != "secure" or sslExpiryDaysLeft < 7 or malicious is True:
         status = "Critical"
-        db.execute(
-            'INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
-                (datetime.utcnow(), "danger", f"A recent scan has resulted in a critical result", 0, userId))
-        db.commit()
+        addAlert(userId, "danger", f"A recent scan has resulted in a critical result.")
     else: status = "Normal" 
 
     db.execute('UPDATE website_log SET status = ?,general = ?,ssl = ?,safety = ?  WHERE id = ?', (status, json.dumps(generalDict), json.dumps(sslDict), json.dumps(safetyDict), logId))
     db.commit()
 
 # Submit a scan request to urlscan.io, then run a thread to get the results later. Pass through db as thread will be out of app context.
-def urlScanIO(domain, logId):
+def urlScanIO(domain, logId, userId):
     headers = {'API-Key':f'{current_app.config["URLIO_API"]}','Content-Type':'application/json'}
     data = {"url": f"{domain}", "visibility": "unlisted"}
     request = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data)).json()
@@ -121,14 +114,14 @@ def urlScanIO(domain, logId):
         return None
     try:
         uuid = request['uuid']
-        thread = Thread(target=urlScanIOThread, args=(uuid, logId, g.user['id']))
+        thread = Thread(target=urlScanIOThread, args=(uuid, logId, userId))
         thread.start()
     except KeyError as e:
         print(e)
 
 # Add all results to dict and return
-def websiteScanner(websiteId, domain):
-    db = get_db()
+def websiteScanner(websiteId, domain, userId):
+    db = sqlite3.connect('instance/endstat.sqlite')
     # Make a new website log entry
     db.execute('INSERT INTO website_log (date_time, website_id) VALUES (?, ?)', (datetime.utcnow(), websiteId))
     db.commit()
@@ -136,13 +129,11 @@ def websiteScanner(websiteId, domain):
     logId = db.execute('SELECT id FROM website_log WHERE website_id = ? AND id = (SELECT MAX(id) FROM website_log)', (websiteId,)).fetchone()[0]
 
     # Run the url and port scanners
-    urlScanIO(domain, logId)
+    urlScanIO(domain, logId, userId)
     # Wait some time for urlscan.io to process the request.
     time.sleep(2)
-    openPorts = portScan(domain)
+    openPorts = portScan(domain, userId)
 
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
     db.commit()
-
-    userId = db.execute('SELECT user_id FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
-    #sendNotification(userId, f"Scan completed for {domain}.\nView it at https://endstat.com/websites/view/{websiteId}")
+    sendNotification(userId, f"Scan completed for {domain}.\nView it at https://endstat.com/websites/view/{websiteId}")

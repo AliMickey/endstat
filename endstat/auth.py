@@ -174,7 +174,7 @@ def checkWebsiteAuthentication(websiteId):
         return True
     return False
 
-
+# Set g.user['id'] to id of user in db
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')

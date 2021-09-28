@@ -11,6 +11,7 @@ from endstat.db import get_db
 from endstat.notifications import sendNotification
 from endstat.scanner import websiteScanner
 from endstat.scheduler import schedAddJob, schedRemoveJob
+from endstat.shared import convertToUserTime
 
 bp = Blueprint('websites', __name__, url_prefix='/websites')
 
@@ -42,8 +43,8 @@ def websiteList():
                 # Get id for newly added website
                 websiteId = db.execute('SELECT id FROM websites WHERE user_id = ? AND domain = ?', (g.user['id'], domain)).fetchone()['id']
                 # Add new job and run initial scan
-                schedAddJob(websiteId, domain)
-                websiteScanner(websiteId, domain)
+                schedAddJob(websiteId, domain, datetime.utcnow(), g.user['id'])
+                websiteScanner(websiteId, domain, g.user['id'])
                 return redirect(url_for('websites.websiteList'))
 
         elif request.form["btn"] == "deleteWebsite":
@@ -61,8 +62,13 @@ def websiteList():
     for row in websitesDB:
         domain, id = row
         websiteLog = db.execute('SELECT datetime(date_time), status FROM website_log WHERE id = (SELECT MAX(id) FROM website_log WHERE website_id = ?)', (int(id),)).fetchone()
-        dateTime = convertToUserTime(websiteLog[0])
-        websiteDict[domain] = [id, dateTime, websiteLog[1]]
+        if websiteLog: 
+            dateTime = convertToUserTime(websiteLog[0], g.user['id'])
+            status = websiteLog[1]
+        else: 
+            dateTime = "Error"
+            status = "Error"
+        websiteDict[domain] = [id, dateTime, status]
     
     return render_template('websites/website-list.html', error=error, websites=websiteDict)
 
@@ -78,7 +84,7 @@ def viewWebsite(websiteId):
 
         # Map and convert row data into dictionaries/strings
         domain = db.execute('SELECT domain FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
-        dateTime = convertToUserTime(websitesDB[0])
+        dateTime = convertToUserTime(websitesDB[0], g.user['id'])
         try:
             status = websitesDB[1]
             general = json.loads(websitesDB[2])
@@ -104,15 +110,3 @@ def viewWebsite(websiteId):
 @login_required
 def websiteSettings(websiteId):
     db = get_db()
-
-# Convert db utc time to local user settings timezone
-def convertToUserTime(dateTime):
-    db = get_db()
-    userTimeZone = db.execute('SELECT time_zone FROM users WHERE id = ?', (g.user['id'],)).fetchone()[0]
-    utcDateTime = datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S")
-    try:
-        convDateTime = pytz.timezone("UTC").localize(utcDateTime).astimezone(pytz.timezone(userTimeZone))
-    except pytz.UnknownTimeZoneError as e:
-        convDateTime = utcDateTime
-    convDate = convDateTime.strftime("%d/%m/%Y %H:%M")
-    return convDate

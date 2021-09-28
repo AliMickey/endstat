@@ -11,19 +11,22 @@ from endstat.scanner import websiteScanner
 def schedInitJobs():
     db = get_db()
     # Get all websites
-    websitesDB = db.execute('SELECT id, domain, datetime(scan_time) FROM websites').fetchall()
+    websitesDB = db.execute('SELECT id, domain, datetime(scan_time), user_id FROM websites').fetchall()
     # For each website, add a job to run a website scan at the specified time
     for row in websitesDB:
-        id, domain, scanTime = row
-        convDate = datetime.strptime(scanTime, "%Y-%m-%d %H:%M:%S").time().strftime("%H:%M")
-        schedule.every().day.at(convDate).do(websiteScanner, websiteId=id, domain=domain).tag(id)
-        print(f"Website id: {id}, domain: {domain} scheduled for {convDate}")
+        id, domain, scanTime, userId = row
+        schedAddJob(id, domain, scanTime, userId)
     thread = Thread(target=schedPendingRunner)
     thread.start()
 
 # Add a new job to the scheduler
-def schedAddJob(websiteId, domain):
-    schedule.every().day.at(datetime.now().strftime("%H:%M")).do(websiteScanner, websiteId=websiteId, domain=domain).tag(websiteId)
+def schedAddJob(websiteId, domain, dateTime, userId):
+    # Convert datetime to object if string
+    if not isinstance(dateTime, datetime):
+        dateTime = datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S")
+    convDate = dateTime.time().strftime("%H:%M")
+    schedule.every().day.at(convDate).do(websiteScanner, websiteId=websiteId, domain=domain, userId=userId).tag(websiteId)
+    print(f"Website id: {websiteId}, domain: {domain} scheduled for {convDate}")
 
 # Remove a job from the scheduler
 def schedRemoveJob(websiteId):
