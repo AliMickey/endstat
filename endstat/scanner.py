@@ -1,6 +1,7 @@
 from io import DEFAULT_BUFFER_SIZE
 from flask import current_app
 import socket, threading, json, requests, time, sqlite3, re
+from flask.typing import URLValuePreprocessorCallable
 from datetime import datetime
 from queue import Queue
 from threading import Thread
@@ -23,7 +24,7 @@ def portScanThread(ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try: 
         result = sock.connect_ex((ip, port))
-        sock.settimeout(None)
+        sock.settimeout(None) #test with 0.2
         if result == 0:
             return port
         sock.close()
@@ -103,10 +104,15 @@ def urlScanIOThread(uuid, logId, userId):
 
     db.execute('UPDATE website_log SET status = ?,general = ?,ssl = ?,safety = ?  WHERE id = ?', (status, json.dumps(generalDict), json.dumps(sslDict), json.dumps(safetyDict), logId))
     db.commit()
+    db.close()
 
 # Submit a scan request to urlscan.io, then run a thread to get the results later. Pass through db as thread will be out of app context.
-def urlScanIO(domain, logId, userId):
-    headers = {'API-Key':f'{current_app.config["URLIO_API"]}','Content-Type':'application/json'}
+def urlScanIO(domain, logId, userId, api=None):
+    if api is None:
+        URLIOAPI = current_app.config["URLIO_API"]
+    else:
+        URLIOAPI = api
+    headers = {'API-Key':URLIOAPI,'Content-Type':'application/json'}
     data = {"url": f"{domain}", "visibility": "unlisted"}
     request = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data)).json()
     if 'status' in request and request['status'] == 400:
@@ -120,20 +126,29 @@ def urlScanIO(domain, logId, userId):
         print(e)
 
 # Add all results to dict and return
-def websiteScanner(websiteId, domain, userId):
+def websiteScanner(websiteId, domain, userId, apis=None):
     db = sqlite3.connect('instance/endstat.sqlite')
     # Make a new website log entry
     db.execute('INSERT INTO website_log (date_time, website_id) VALUES (?, ?)', (datetime.utcnow(), websiteId))
     db.commit()
     # Select the id of the newly made log entry
     logId = db.execute('SELECT id FROM website_log WHERE website_id = ? AND id = (SELECT MAX(id) FROM website_log)', (websiteId,)).fetchone()[0]
+    
+    # Check if apis are passed to thread, otherwise use app config
+    urlApi = None
+    mailApi = None
+    if apis is not None:
+        urlApi = apis[0]
+        mailApi = apis[1]
 
     # Run the url and port scanners
-    urlScanIO(domain, logId, userId)
+    urlScanIO(domain, logId, userId, urlApi)
     # Wait some time for urlscan.io to process the request.
     time.sleep(2)
     openPorts = portScan(domain, userId)
 
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
     db.commit()
-    sendNotification(userId, f"Scan completed for {domain}.\nView it at https://endstat.com/websites/view/{websiteId}")
+    db.close()
+
+    sendNotification(userId, f"Scan completed for {domain}.\nView it at https://endstat.com/websites/view/{websiteId}", mailApi)

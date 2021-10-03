@@ -33,6 +33,7 @@ def dashboard():
     #     icon = getAlertIcon(type)
     #     conv_date = datetime.datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")
     #     dashboardDict[message] = [conv_date, type, icon]
+    db.close()
 
     return render_template('main/dashboard.html')
 
@@ -64,6 +65,7 @@ def injectNavDetails():
     if (g.user):
         navDetailsDict = {}
         navDetailsDB = db.execute('SELECT message, datetime(date_time), type, id FROM user_alerts WHERE user_id = ? AND read = 0', (g.user['id'],)).fetchall()
+        db.close()
         for row in navDetailsDB:
             message, dateTime, type, id = row
             conv_date = datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S").date().strftime("%d/%m/%Y")

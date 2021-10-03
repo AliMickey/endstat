@@ -8,6 +8,7 @@ from endstat.db import get_db
 def convertToUserTime(dateTime, userId):
     db = get_db()
     userTimeZone = db.execute('SELECT time_zone FROM users WHERE id = ?', (userId,)).fetchone()[0]
+    db.close()
     utcDateTime = datetime.strptime(dateTime, "%Y-%m-%d %H:%M:%S")
     try:
         convDateTime = pytz.timezone("UTC").localize(utcDateTime).astimezone(pytz.timezone(userTimeZone))

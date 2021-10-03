@@ -69,6 +69,7 @@ def websiteList():
             dateTime = "Error"
             status = "Error"
         websiteDict[domain] = [id, dateTime, status]
+    db.close()
     
     return render_template('websites/website-list.html', error=error, websites=websiteDict)
 
@@ -99,9 +100,8 @@ def viewWebsite(websiteId):
                     If this is the first scan, please wait for around 5 seconds then try again.
                     Otherwise, send an email to 'endstat@mickit.net' to let us know.
                     """)
-
+        db.close()
         return render_template('websites/website.html', domain=domain, dateTime=dateTime, status=status, general=general, ssl=ssl, safety=safety, ports=ports) 
-    
     else:
         abort(403)
 
@@ -110,3 +110,4 @@ def viewWebsite(websiteId):
 @login_required
 def websiteSettings(websiteId):
     db = get_db()
+    db.close()

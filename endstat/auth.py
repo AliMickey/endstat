@@ -61,6 +61,7 @@ def register():
                 'INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
                     (datetime.utcnow(), "primary", "Welcome to End Stat, we hope you enjoy it!", 0, userID))
             db.commit()
+            db.close()
             #TEMPDISABLE sendNotification(userID, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you haven't already!")
             return redirect(url_for('auth.login'))
 
@@ -75,7 +76,7 @@ def login():
         password = request.form['password']
         db = get_db()   
         user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-
+        db.close()
         if user is None or not check_password_hash(user['password'], password):
             error = 'Incorrect email or password. Please try again.'
 
@@ -110,6 +111,7 @@ def forgotPassword():
                 db.execute('INSERT INTO reset_pass (reset_key, user_id, date_time, activated) VALUES (?, ?, ?, ?) ', 
                     (str(resetKey), userID, datetime.now(), False))
                 db.commit()
+                db.close()
             sendEmail(email, f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
         error = "If your email exists in our system, you will receive an email soon with instructions. Check your spam if you do not see it."
 
@@ -146,9 +148,10 @@ def resetPassword(resetKey):
                     (resetKey,))
                 db.commit() 
                 sendEmail(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id'],)).fetchone()[0], "Letting you know that your password was reset.")
+                db.close()
                 session.clear()
                 return redirect(url_for('auth.login'))
-
+    
     return render_template('auth/reset-password.html', error=error)       
 
 # View to clear session
@@ -170,7 +173,9 @@ def checkPasswordResetValidity(genTime, activated):
 # Check if a given website id is owned by the current user.
 def checkWebsiteAuthentication(websiteId):
     db = get_db()
-    if db.execute('SELECT EXISTS(SELECT 1 FROM websites WHERE user_id = ? AND id = ?)', (g.user['id'], websiteId)).fetchone()[0]:
+    exists = db.execute('SELECT EXISTS(SELECT 1 FROM websites WHERE user_id = ? AND id = ?)', (g.user['id'], websiteId)).fetchone()[0]
+    db.close()
+    if exists:
         return True
     return False
 
