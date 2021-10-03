@@ -116,7 +116,6 @@ def settings():
             db.execute('DELETE FROM reset_pass WHERE user_id = ?', (userId,))
             session.clear()
             return redirect(url_for('main.index'))
-    db.close()
     return render_template('profile/profile-settings.html', errorUser=errorUser, errorPass=errorPass, errorNotif=errorNotif, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], currentTZone=userDetails['time_zone'], notifDetails=notifDetails)
 
 # View for user alerts
@@ -136,7 +135,6 @@ def alerts():
     if (request.method == 'POST'):
         db.execute('UPDATE user_alerts SET read = 1 WHERE id = ?', (request.form['read'],))
         db.commit()
-    db.close()
     return render_template('profile/alerts.html', error=error, alerts=alertsDict)
 
 # Add an alert for specified user
@@ -145,7 +143,6 @@ def addAlert(userId, type, alert):
     db.execute('INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
             (datetime.utcnow(), type, alert, 0, userId))
     db.commit()
-    db.close()
     
 # Convert alert type to respective icon
 def getAlertIcon(type):

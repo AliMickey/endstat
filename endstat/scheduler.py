@@ -12,7 +12,6 @@ def schedInitJobs():
     db = get_db()
     # Get all websites
     websitesDB = db.execute('SELECT id, domain, datetime(scan_time), user_id FROM websites').fetchall()
-    db.close()
     # For each website, add a job to run a website scan at the specified time
     for row in websitesDB:
         id, domain, scanTime, userId = row
