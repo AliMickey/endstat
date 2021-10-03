@@ -15,38 +15,38 @@
 
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="col-md-6 col-xl-4 mb-4">
                         <div class="card shadow border-start-primary py-2">
                             <div class="card-body">
                                 <div class="row align-items-center no-gutters">
                                     <div class="col me-2">
-                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Active Websites</span></div>
+                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Total Scans (this month)</span></div>
                                         <div class="text-dark fw-bold h5 mb-0"><span>2</span></div>
                                     </div>
-                                    <div class="col-auto"><i class="fas fa-calendar fa-2x text-gray-300"></i></div>
+                                    <div class="col-auto"><i class="fas fa-clock fa-2x text-gray-300"></i></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="col-md-6 col-xl-4 mb-4">
                         <div class="card shadow border-start-success py-2">
                             <div class="card-body">
                                 <div class="row align-items-center no-gutters">
                                     <div class="col me-2">
-                                        <div class="text-uppercase text-success fw-bold text-xs mb-1"><span>Critical Issues</span></div>
+                                        <div class="text-uppercase text-success fw-bold text-xs mb-1"><span>Average Security Rating (Past 5 Scans Of All Websites)</span></div>
                                         <div class="text-dark fw-bold h5 mb-0"><span>1</span></div>
                                     </div>
-                                    <div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div>
+                                    <div class="col-auto"><i class="fas fa-lock fa-2x text-gray-300"></i></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="col-md-6 col-xl-4 mb-4">
                         <div class="card shadow border-start-info py-2">
                             <div class="card-body">
                                 <div class="row align-items-center no-gutters">
                                     <div class="col me-2">
-                                        <div class="text-uppercase text-info fw-bold text-xs mb-1"><span>Next Certificate Expiry</span></div>
+                                        <div class="text-uppercase text-info fw-bold text-xs mb-1"><span>Next Certificate Expiry (domain)</span></div>
                                         <div class="row g-0 align-items-center">
                                             <div class="col-auto">
                                                 <div class="text-dark fw-bold h5 mb-0 me-3"><span>13 Days</span></div>
@@ -58,177 +58,153 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-auto"><i class="fas fa-clipboard-list fa-2x text-gray-300"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-3 mb-4">
-                        <div class="card shadow border-start-warning py-2">
-                            <div class="card-body">
-                                <div class="row align-items-center no-gutters">
-                                    <div class="col me-2">
-                                        <div class="text-uppercase text-warning fw-bold text-xs mb-1"><span>Pending Requests</span></div>
-                                        <div class="text-dark fw-bold h5 mb-0"><span>18</span></div>
-                                    </div>
-                                    <div class="col-auto"><i class="fas fa-comments fa-2x text-gray-300"></i></div>
+                                    <div class="col-auto"><i class="fas fa-certificate fa-2x text-gray-300"></i></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                
                 <div class="row">
                     <div class="col-lg-7 col-xl-8">
                         <div class="card shadow mb-4">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="text-primary fw-bold m-0">Earnings Overview</h6>
-                                <div class="dropdown no-arrow"><button class="btn btn-link btn-sm dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown" type="button"><i class="fas fa-ellipsis-v text-gray-400"></i></button>
-                                    <div class="dropdown-menu shadow dropdown-menu-end animated--fade-in">
-                                        <p class="text-center dropdown-header">dropdown header:</p><a class="dropdown-item" href="#">&nbsp;Action</a><a class="dropdown-item" href="#">&nbsp;Another action</a>
-                                        <div class="dropdown-divider"></div><a class="dropdown-item" href="#">&nbsp;Something else here</a>
+                                <h6 class="text-primary fw-bold m-1">Latest Scan (domain)</h6>
+                            </div>
+                            <div class="row align-items-start">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">General Information</h5>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">Status:</li>
+                                                <li class="list-group-item">Scan Time</li>
+                                                <li class="list-group-item">IP Address: </li>
+                                                <li class="list-group-item"></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Security Info</h5>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">Security Rating: </li>
+                                                <li class="list-group-item">Verdict Reports: </li>
+                                                <li class="list-group-item">Certificate Expiry: </li>
+                                                <li class="list-group-item"></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Open Ports</h5>
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <!-- <caption>Showing {{ports|length}} open port/s</caption> -->
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Port</th>
+                                                            <th>Protocol</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <!-- <tbody>
+                                                        {% for port in ports %}
+                                                            {% if port[2] == "safe" %}
+                                                                {% set colour = "table-success" %}
+                                                            {% elif port[2] == "warn" %}
+                                                                {% set colour = "table-warning" %}
+                                                            {% elif port[2] == "danger" %}
+                                                                {% set colour = "table-danger" %} 
+                                                            {% endif %}
+                                                            <tr class="{{colour}}">
+                                                                <td>{{port[0]}}</td>
+                                                                <td>{{port[1]}}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody> -->
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <div class="chart-area"><canvas data-bss-chart="{&quot;type&quot;:&quot;line&quot;,&quot;data&quot;:{&quot;labels&quot;:[&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;,&quot;Jun&quot;,&quot;Jul&quot;,&quot;Aug&quot;],&quot;datasets&quot;:[{&quot;label&quot;:&quot;Earnings&quot;,&quot;fill&quot;:true,&quot;data&quot;:[&quot;0&quot;,&quot;10000&quot;,&quot;5000&quot;,&quot;15000&quot;,&quot;10000&quot;,&quot;20000&quot;,&quot;15000&quot;,&quot;25000&quot;],&quot;backgroundColor&quot;:&quot;rgba(78, 115, 223, 0.05)&quot;,&quot;borderColor&quot;:&quot;rgba(78, 115, 223, 1)&quot;}]},&quot;options&quot;:{&quot;maintainAspectRatio&quot;:false,&quot;legend&quot;:{&quot;display&quot;:false,&quot;labels&quot;:{&quot;fontStyle&quot;:&quot;normal&quot;}},&quot;title&quot;:{&quot;fontStyle&quot;:&quot;normal&quot;},&quot;scales&quot;:{&quot;xAxes&quot;:[{&quot;gridLines&quot;:{&quot;color&quot;:&quot;rgb(234, 236, 244)&quot;,&quot;zeroLineColor&quot;:&quot;rgb(234, 236, 244)&quot;,&quot;drawBorder&quot;:false,&quot;drawTicks&quot;:false,&quot;borderDash&quot;:[&quot;2&quot;],&quot;zeroLineBorderDash&quot;:[&quot;2&quot;],&quot;drawOnChartArea&quot;:false},&quot;ticks&quot;:{&quot;fontColor&quot;:&quot;#858796&quot;,&quot;padding&quot;:20}}],&quot;yAxes&quot;:[{&quot;gridLines&quot;:{&quot;color&quot;:&quot;rgb(234, 236, 244)&quot;,&quot;zeroLineColor&quot;:&quot;rgb(234, 236, 244)&quot;,&quot;drawBorder&quot;:false,&quot;drawTicks&quot;:false,&quot;borderDash&quot;:[&quot;2&quot;],&quot;zeroLineBorderDash&quot;:[&quot;2&quot;]},&quot;ticks&quot;:{&quot;fontColor&quot;:&quot;#858796&quot;,&quot;padding&quot;:20}}]}}}"></canvas></div>
-                            </div>
                         </div>
                     </div>
+
                     <div class="col-lg-5 col-xl-4">
                         <div class="card shadow mb-4">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="text-primary fw-bold m-0">Revenue Sources</h6>
-                                <div class="dropdown no-arrow"><button class="btn btn-link btn-sm dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown" type="button"><i class="fas fa-ellipsis-v text-gray-400"></i></button>
-                                    <div class="dropdown-menu shadow dropdown-menu-end animated--fade-in">
-                                        <p class="text-center dropdown-header">dropdown header:</p><a class="dropdown-item" href="#">&nbsp;Action</a><a class="dropdown-item" href="#">&nbsp;Another action</a>
-                                        <div class="dropdown-divider"></div><a class="dropdown-item" href="#">&nbsp;Something else here</a>
-                                    </div>
+                                <h6 class="text-primary fw-bold m-1">Thumbnails</h6>
+                            </div>
+                            <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                  <div class="carousel-item active">
+                                    <img src="https://news.cgtn.com/news/2020-11-02/Analysis-China-is-betting-on-science-and-tech-like-never-before-V68V871ula/img/871ca9ce8b9941088260b6ed4ced4eeb/871ca9ce8b9941088260b6ed4ced4eeb.jpeg" class="d-block w-100">
+                                  </div>
+                                  <div class="carousel-item">
+                                    <img src="https://www.industryconnect.org/wp-content/uploads/2018/10/nztech.jpg" class="d-block w-100">
+                                  </div>
+                                  <div class="carousel-item">
+                                    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAoHCBUWFRgWFRYYGRgaGRkaHBwZGBgZGRgYGBgZGRgaGBkcIzAlHB4rHxkYJjgmKy8xNTU1GiQ7QDszPy40NTEBDAwMEA8QHxISHj0rJSs2NDQ0PT00NDQ0NDQ0NDQ0NDQ0NDQ0MTQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ9NP/AABEIALcBEwMBIgACEQEDEQH/xAAcAAEAAgMBAQEAAAAAAAAAAAAAAwQCBQYBBwj/xAA+EAACAgAFAgQEAwUGBQUAAAABAgARAwQSITFBUQUiYYETMnGRobHBBkJS0fAHFGKisvEjM4KS4RVyc8LS/8QAGwEAAgMBAQEAAAAAAAAAAAAAAAMBAgQFBgf/xAAkEQADAAIDAAEEAwEAAAAAAAAAAQIDERIhMRMiMkFRBGFxFP/aAAwDAQACEQMRAD8A+VRPJ7NmzKLns8iWTIMhM1ExVZlLohkqntJEkYWusmCesbOxdaJsJdr7S3lcPUdzQ9ZBghevbb6yfBWwTe/QTTK8M1v0t4am6AuXEatusrZVyt7b/lLuXUg6mXUJolmHI/2SIal7HUEJp3JS2676mHtsBK2BhBiLtRfNWBJFVlPk26X3H6SX20Z9rZJl2YMKpmJ4okfQiUMZ9i4FbMRQ2q2o787hh7SXHd8KnHfmrANNV9zzt2ua4YIYEE+a+Ddn0095D3vofjla2zYYrI2+G9nYkeYiwjahZ6ANV9SDtxNQiObYA6Ryeg1cA/aTnKEKauzYo2TwB1nuTyrMGoknahRNk0BQ/rmLUUaHUpEuRo9L9J03hniDKQFxHUit9TFRX7uk7V7TWZLIha8wDE9AbHpVTb5TwnUGbWBpIBBU3vJtRx1ZheRu/o9Pofg2f+KnmrUOSNgQetdOxHebSc/+zeXCg+a9u1ToJwM0qbanw9P/AB6qsadens9iIoeIiIAIiIAIiIAIiIAIiIAIiIAfkOIibDKez0CAJ6bggBa5ksE7w3PMuirJcI7yXVIVNTNWjZroXSLOCdxvLauVOx44lPCMs2DHzXRntdl7DxGY3e/WXsLHI6+0qZIbGq2Fluw/mTQkL5uifL/Rj1ejJeN09JG5bNcc3+ElGdKXqU8EU21WKB9uZof78etX9D/OMbOll0sRv1IrYdLuFZFoif43a6J8XM4hALPqOzAEE1YO1VW2w/nvXhzDmjZv6cHpRHtK+Az6gF0liaAVVckk0AFY1z7ib7JeHBkOh8Nnw1d2LBmDoiM2lV0lXOx+UnvxFfNxXbNXxfpIoYeeKKjMbYu5I6/uc3xyZhlPFXUu17tfFAKSb2+nFTWWfhoTvqLkbjbZR+k8y7+8hZHv0LxzrtHU5TxBmZSQNt+ovfkm9vauJ9A8EzSUtrV77b19Z8uy7UAf6qdjkc0q0qNqAUb9/SWzTznRlwtRk3ro+lYDLytb9pZE5rwnOAcnabzK5tXvSbqcbJDlnexZJpFuIiKHCIiACIiACIiACIiACIiACIiAH5DiImszHuo1Ues8i5IGSzJZhM4IqzMGTYVE7yusnXaNli6LH0k68Sost4WIaI7x00IpFjCM2eGmlQTXm+nTvNbgjiWw+8fLMeQuMFatSg1fAo7m965lbxLAwgq0rBrbe/KQKr3sn8PabDMzfEUlSEBYbKCNYctf7reU1SwtrjsjDyda2ReDaEfUSaCsDsNkdSjNzsRqBoes7A+Pg5J8MqiqiaNaODqtWrSACQxAFggE2eOZzfh2UxQ4OGlNpa7CtSkBTajVvvVVe/pMsLwvGVGW1X4uIuGinUQ7tYFpp06QpJs8dNxM2RTS2zXjdJnKYe4w1I5B/wBb8fh9pfyGOygrbaCwDeunVsOnNcb8yTPeFPgZhcviBdaCiFshtbFl00K4aWnyyKoV9etSxLarB+QIDY3o6udxfrKTXg+45bKmFmLoHpN5k8djsgr1biad8oFxnStw7r7KT/4mxy76Y1ZujN/y7Z1mQyrkAs+r/wBs6jwnEKuoIoMCPcbi/Xbj1nGeFZ0rdH1nXeHZ44o0mr2puoI494jM3SNOHEofXp1gianKeKJp3PG1dZtpgpNHQT2exESCRERABERABERABERABERAD8hxEVNRm2IMVPZJB6tXvMpgJIqE9DJRDMkaSk2b7yNcNuxky4TdjGTsXTRkss4Q6n/eY4K0LZbG3pX0makE9vxjZE0WsE9e0sYchXDoCiDe9A79txJFaudvaOTMtrfhewhc1+dyr0djsbsHaulDptLgzQVdQBO4HudVf6TKeGCLLAHcBhqokMHv8P07yKrfROKHPZf/AGQzjpjFRvqSgGIB16ka1v8AeoGge5nVZnxLGVcBHRhozAx9R0rqw8LU+JuD0B/Dg8HgGwAQNK9RY10u19+Bv7XzvNh4DnsNGP8AeAzp8N9CimAdqXUC3B0lhfehMty++jdNS9I3H7Vu2IcXFQBiuMhV1DalVsPDYAMDwQyHcTxVx9H/AA3WwhLmwwYKVLA2CQQbJvqRxsJrsviI6ujFwdeGy/KBpGFhLTGi1gJQANcest440JSstsxfTq30uTYBAr91dtovxI0Sk2/10a85dyWYqb1tzdkGiD6jnf6yyisT8p670e/We4maTRW4cEn5tvfaR5bNb3rFH1++0N6J49mxyOIQa9DOh8HzWlgfWcpkMyA4Lbrd119pucrjjVYsC9vpBVshyd3lVwdesnlr0ngN3E6RGBAI4IufPvD/ADkDrqH0959AwhQA22AG3HtEZVpobDJYiIouIiIAIiIAIiIAIiIAIiIAfkWoqZ6Y0zbox7MAIIkirMSIaDZjUmWq56esjqAILoGWFI7jj1ljCNV5h+P8pTVZIGuMli6Rc1LR3F1XXuP5TzCEiAlnLld7vg1XeX9YqukTKd5ey63zKeGR2+5/lNll29B9r/OWb0JS2y+gRE+IyIyq6WpJVm3sVQI78iazPZpcR2drtr3AAAO9cDcbjp09dt62Oz4LYSgF2KaTpWl0nkKBud/95oc8jltRVF9Fw0Vb2BruTpDe59YuW2+x9JSujw4IZdtHQdQLHUj6XzKrWjsjIuxCgeYaSBepQTZsVue8sYWYZKIKWf8AAnXc9K/3lo4wzGI7hB8Q6aVFoaVSmIFVfHb5hJvf6IxNNnmQzQRn8oPmB+lIor8JssZnGKgwzT0mljpGkl3Aok6QPcjfmazLuUZ9SEW37ykcWOo9ZuHzWD5VcDSyIpNC1Gt/wNmveYreuzpwm9o0XjCOHOttTVZOpWuz3UkdJQwjLudVN9F15aBrbbfcesrphwVdIlz2XcsZtsq5kfgXhT47qiAaj1JoADkk9p9Ayf7BqK+Jik+iLX2JJ/KTzS9KuTS+FZvSRPpOVvQurmhd96lDIeAYGEQVS2H7zbkfToPYTbxd1yJmdCIiULCIiACIiACIiACIiACIiAH5M0xpk2ie6a+s6XE53Ij0bHv29JERLGmYuBe116wckqiGpkqz2p7ZqunMjROzwmerPAJkBAhsmVzQHQcSVJCsnw5aRVlnCmyy81uFNnl5Zip9NhgmYZ8q4Ualrc7so34HP16esxxMHWhUGrFd5XyPgDviqmoANtrq1Hq3aV69Y3t9JEi+H7WCmnTe9AgkURvtxZ57TWZ80mHR5+IwrahrIA/ymdN43+zX93wmxDjKaZQNIFnUdO1MehPSaI5dWVaZSRyNJtaZj83XVrJr0F8Su9rae0Tri+1p6M8n4q6Eq9umtxvyAGI2J546zscrlcLFKHDfQi6W8oBpiXFlWB33P4Ti8XGOh1B2fFa9+zPW3/VLb5x8HHw3UGgiBkBrUvxHtDX2upmpbS3/AGdCK03r+h47kXTFffWob5qAJ25YACvylXLYdzbZDOrjLrHJJLAncE9JeXw0MLQAE9Oh/kZR9DE9s6n+zXw+hiYpHZFP4tX+Wd5Nd4FgqmXw1XgKOlG/3rHe7myin6AiIgAiIgAiIgAiIgAiIgAiIgAiIgB+Z8FfKKW+el9TxGhtrHI3pfpzK+meFZ3DjfkmVCata7+Xnb6SIoaNr0bfTXTb+vSRkTAiVZZEBE8qSsJ5pimhuyOpkBJVwrmYwJHFlXSIlEmSBhGWUy/rJUsXVI9wptMohJAHM1qrRqbbwzECuCeJLKT6bdfDnCkiiQOLlXPo6BGfbWD5AwIocbjmwZO+NRZi76ennYUPoBxOazWbZvm1aQTVmyNVdevHH1lGtDpey9iHXhM++nVoFAEatJY89fl+81OQLMFA3twK4NuyD7bCX8g22nUVGlyzJYfSVO19t6O455muwc23xMMEKNkvT5QdIX5gtWduvWKba2PST0WFwms1sQ5H0Nnmb3xZqzGEyKdCLh6nC2AGdydm2NKyn3moZSDZ6kkURvw3AO3zDmdQPEUR8HDSjhhkdnYsCdgoY1VBQqngcRGbaS0jXg4tvb/Jz2fK4GMvwX1qAb2UXek0dO3UzpvCvEVOkgje9vpVg/ec9+1mJhnHvCIZaskEsCTXU+gnvgjoG1kE6dwBQ81gbnoN5Se5TL01yej6b+zvjg+MyM50mgqkDSCKW1PNltQr0naCfEsiSDyQeb+4v0PQDvPqH7MeJHETS3zr+IPA9thKtAb6IiVAREQAREQAREQAREQAREQAREQA/NPw5i2HNm2XjDytz0bg838yXZqDhGRthmdAcqB0kGLgDtIeLZM/yEaFlhE3myxMqJDg4BLaRzEvE0zQsqa6MAk9AkhSZ4KWwB6kS3EpyI1EnQS3h5VSwGk7jnV6fSVyF6ggHb5uOfSQ5aF7VeET1qmy8PwNbBbq+vNUCePaV8DAQ/usSGrZwO+4sekw8Zf4YQ4RNNquyG+U1saqIqWx+JrejHxFwNS93bnY6QQOvqOPSa5KsXxe/X6yLMZhyW81j6D61JUdgw0MrHVQ8o38yUaI719j3MVvRq47Nrl0wgNnKNW2oNpN70RVHqa61W+00RyrLodgQpalJ4Ogrt9d5Pj5t2oMFtBS0vIXYLfBHrzsJ6uFZXzoQMUKBwzDUPPp/h/WUrpbLym6SJVPm/roa/SW3Jrfqu303H5gylmcYh2WhSsw43+Yt+s3r+KITgu/kdCGKqlqULgoAb53cm+QRF3bSXQ+ITb7/JpGIJlvIuVJ7Uf6/Ce/tFmg+YLigGVSAK2FbDbrMMsbPsf9Jik9pMY1xbR02SawGHv19LP5GdP4VjshDKdxx1B/w3zv/CZxHhuOUI7de1dZ1eTxAtVuDuD6dVPeVosj6Pks0uIoZfcdj2lmcd4Rnvht/hOx+nf2nXhr4lCTKIiACIiACIiACIiACIiACIiAHxXEynpM8HK7TfZnJkAFhV8Sl8Op6Ob5I8A81a0+manFwJSxMKb7EwrlTEyp7Rssbjzfs0WIk1+PsTU32ayjAXR3mpxsq3aWc8l0dHDaf5KyMDM1NEEdJg2CR0MwIMW4aNHT8LL51ulfaQnFJPAv6CYLhk9DJDhkVF1FP0n6Z8JsLMsO3/aOZ7nmbEHmrygkUAPU8QiXvJjpCtqB3FCuhsb+u1/eVeN6Kc9V0c98I81vfFH7wcNuSK39RXBubX4XbeQvhqTdkHe9tgNgNvrf3HaZ6xaNc5tlQ5fiiDtZoMAKHBsD6fXr1mTYBV1OoEDEVbGrnUOjAHpL2pQCVFHYWVPlBNWdv58SlhuPKukf81W1G9XIFbGq6xNw9GjHW2tkmbALtRN6jd1V0KK+lfjc3/jGKTjZW0somGoRBpBVMd9GGFr0C31lXFxMLQ6sHLDEtdLqEAIK/KVJJtTftNl4d4OuNiojYhWkWtJ5GvEbyOBW232My5EuKbNmNvk0jnPG8yXzDuyfDLEHSCCFGkAURzxfvMcliUR7/lUg8aVlx8RW5Vyuw/hOn9JjgEgjY89pVLpBT+pm+y2KJvvDczXkJ2PB/hbp7d5x+XxptsvmJDQbO0wcejvzwZ237P5rXh11U17HcfqPafMstmtS/wCIc+o6H24nWfsZnf8Aisl/Mp+6m/yLSjRdM7iIiVJEREAEREAEREAEREAEREAOKzzIwO9FeB9eZq8fZV8o67jk/WY4uL3MpZh53sePWls+e1keSt60ZHH7CYPjnsJBiFkGrvxfrNXj4hAB1c9jxNcymNx4VRsWxCTRqveUsaweB+Morm2v5jIcfOsTZJNx0rizZGBp9FjGvsKlUDfiV3xyeSfvMUJJ2Mv8kr8GpY2kdRlrCi0A+hnniF6fkBHe7qc6viOKu2s/gfzmRzrsPMxMzulsR/zWq5bRewgP4ZJmlGn5eTNZh4p7zLNYxob9ZNZZ9L/G+SNhk8mz7Ko39aknwCmsNgIdFE6jYNUKpbF+cde80oxWqwTIv70qlwTr1WAVugfLTb1fB2PeZ7yrY/Hip77Ntj58CgctheYkKQrbkEDbfc7iajFTUdaqopgSuw6kjSDvWws+vqJ5/wCoqtUWsE0Qen379qngzCsTpO+libNACi3zC+gJiKyTpmrHjafSOh8R8JxlOv4PlLONVrfkc0OeOeZazXxck+DiHCDYdKoKv5iXYkA0bvk1XvNenjmLhsdbOya38hOx16jXpzdjtIvG/ENRy516MPXraiXCkabKg9g5FbdZgrKqSlr9nQ+Kpp0n+jQeMZh/jO7DzOWYgjgljY9p6nirDRQWx6Hfexe8p+KZkviu93qZj06segsde8ql6kVel0VWPlrfptP70WazV+gqXsDMiaFHlvCxPWL5jPjR0uTz+lgZ0ngXiS4eOj15dYUf9Xlb7Ak/afPkxDNvkM0CwDMVWqur3AO/v+sh1ssoSP0KJ7Nf4Fm/i5fBxDy+GhP10jV+NzYRA4REQAREQAREQAREQAREQA+OYuanqZhWXc/Lx7zTtjTEY1Ges+JHiVgWizmmN0Dq+k1+K20tMaNqb9ZVdjpboLll0jTjnREdlJJ9pVZrEO1yP4hAIHBi6o1zJ4x7zEvMCZjFVQ1SSBpLhme5ZAeRe9S3goP4Rd1KpNlKpIhwzGNmVog39hyPeX8LDXoo2MkwvCA7EWFN9r2O20rSaQqal12aNMewQASOCegs0LPSROh2v6g737e4MlXKMpdBZG+oLZ2Q7Mw7DeSYGOyhGDE6fKE81hQxckFaoXXvZ6TM9/k3SpXclQYW1H5SR12sCuff8Zcy+EqrillDsyHQ2pQcNj5i61+9wOlWe9Ri4hZSNyLHN6ATyyryt6R6dK2ExyKMTQUlV8zeUkAWBZJ2F7DfbcDrFWtz2NhtV6YeL5jzjqC4P3Rf/wBTDxsrowlUk18QnVtuRh/qGHsJJ4kF+PhM48rNhs6oK2ZMFioG1bGqse0r+J5hcTdURQqahp1Frc0wcnsV2AAABveyZjSfSN1Ndv8Aw0iMbNzx23mWAPmvnaQ4vMml0Ul/UTo8lR5SVpMjRQwva9pawcxQ+b2/P9JrhizEYkkD9Cf2X5z4mQQdUfET/OXF+zidhPmf9iGPeXzC9scN/wB2Eg/+k+mRb9LI9iIgSIiIAIiIAIiIAIiIAfnrXMC8RPaM8ukj1MXkH2nmafYX15iIqiUvqRTx0qvWQMYiJo0T4YEwDERLGEuHiEcGWEx27xEELpItLjtfMvYGaxBuD+URJZltaPGJGDi+avObH8TYi4ZUsaPRWG1Vv3mgbC0lxqIIbTdEHa1ddjsPML5v7xEyP8/6dKPtX+IsYeENGtHtgaYFbUAqCPm5P/MHH7u3IlHEUgGmqww2vgdL63ERb7RbxlrFzaYZwHdA6HDCsp50nCwsEsD/ABA0R/RFDN5oYm9izhqppAgBV8QCwuxOgAkjkmImOfuN9faahPmYfUSLGO8RIrwJ+4juZK8RFDSdWE8Y9YiAH2b+wprws1/8mH/oM+qxEqyT2IiQAiIgAiIgAiIgAiIgB//Z" class="d-block w-100">
+                                  </div>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-area"><canvas data-bss-chart="{&quot;type&quot;:&quot;doughnut&quot;,&quot;data&quot;:{&quot;labels&quot;:[&quot;Direct&quot;,&quot;Social&quot;,&quot;Referral&quot;],&quot;datasets&quot;:[{&quot;label&quot;:&quot;&quot;,&quot;backgroundColor&quot;:[&quot;#4e73df&quot;,&quot;#1cc88a&quot;,&quot;#36b9cc&quot;],&quot;borderColor&quot;:[&quot;#ffffff&quot;,&quot;#ffffff&quot;,&quot;#ffffff&quot;],&quot;data&quot;:[&quot;50&quot;,&quot;30&quot;,&quot;15&quot;]}]},&quot;options&quot;:{&quot;maintainAspectRatio&quot;:false,&quot;legend&quot;:{&quot;display&quot;:false,&quot;labels&quot;:{&quot;fontStyle&quot;:&quot;normal&quot;}},&quot;title&quot;:{&quot;fontStyle&quot;:&quot;normal&quot;}}}"></canvas></div>
-                                <div class="text-center small mt-4"><span class="me-2"><i class="fas fa-circle text-primary"></i>&nbsp;Direct</span><span class="me-2"><i class="fas fa-circle text-success"></i>&nbsp;Social</span><span class="me-2"><i class="fas fa-circle text-info"></i>&nbsp;Refferal</span></div>
-                            </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                  <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                  <span class="visually-hidden">Next</span>
+                                </button>
+                              </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
-                    <div class="col-lg-6 mb-4">
+                    <div class="col-lg-8 mb-4">
                         <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="text-primary fw-bold m-0">Projects</h6>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="text-primary fw-bold m-1">Latest 5 Scans</h6>
+                            </div>
+                            <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">First</th>
+                                    <th scope="col">Last</th>
+                                    <th scope="col">Handle</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <th scope="row">1</th>
+                                    <td>test</td>
+                                    <td>test</td>
+                                    <td>@test</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="text-primary fw-bold m-0">Website Usage</h6>
                             </div>
                             <div class="card-body">
-                                <h4 class="small fw-bold">Server migration<span class="float-end">20%</span></h4>
-                                <div class="progress mb-4">
-                                    <div class="progress-bar bg-danger" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%;"><span class="visually-hidden">20%</span></div>
-                                </div>
-                                <h4 class="small fw-bold">Sales tracking<span class="float-end">40%</span></h4>
-                                <div class="progress mb-4">
-                                    <div class="progress-bar bg-warning" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%;"><span class="visually-hidden">40%</span></div>
-                                </div>
-                                <h4 class="small fw-bold">Customer Database<span class="float-end">60%</span></h4>
-                                <div class="progress mb-4">
-                                    <div class="progress-bar bg-primary" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"><span class="visually-hidden">60%</span></div>
-                                </div>
-                                <h4 class="small fw-bold">Payout Details<span class="float-end">80%</span></h4>
-                                <div class="progress mb-4">
-                                    <div class="progress-bar bg-info" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"><span class="visually-hidden">80%</span></div>
-                                </div>
-                                <h4 class="small fw-bold">Account setup<span class="float-end">Complete!</span></h4>
-                                <div class="progress mb-4">
-                                    <div class="progress-bar bg-success" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"><span class="visually-hidden">100%</span></div>
-                                </div>
+                                <div class="chart-area"><canvas data-bss-chart="{&quot;type&quot;:&quot;doughnut&quot;,&quot;data&quot;:{&quot;labels&quot;:[&quot;Used&quot;,&quot;Available&quot;],&quot;datasets&quot;:[{&quot;label&quot;:&quot;&quot;,&quot;backgroundColor&quot;:[&quot;#4e73df&quot;,&quot;#1cc88a&quot;],&quot;borderColor&quot;:[&quot;#ffffff&quot;,&quot;#ffffff&quot;],&quot;data&quot;:[&quot;50&quot;,&quot;30&quot;]}]},&quot;options&quot;:{&quot;maintainAspectRatio&quot;:false,&quot;legend&quot;:{&quot;display&quot;:false,&quot;labels&quot;:{&quot;fontStyle&quot;:&quot;normal&quot;}},&quot;title&quot;:{&quot;fontStyle&quot;:&quot;normal&quot;}}}"></canvas></div>
+                                <div class="text-center small mt-4"><span class="me-2"><i class="fas fa-circle text-primary"></i>&nbsp;Used</span><span class="me-2"><i class="fas fa-circle text-success"></i>&nbsp;Available</span></div>
                             </div>
-                        </div>
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="text-primary fw-bold m-0">Todo List</h6>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item">
-                                    <div class="row align-items-center no-gutters">
-                                        <div class="col me-2">
-                                            <h6 class="mb-0"><strong>Lunch meeting</strong></h6><span class="text-xs">10:30 AM</span>
-                                        </div>
-                                        <div class="col-auto">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1"></label></div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="list-group-item">
-                                    <div class="row align-items-center no-gutters">
-                                        <div class="col me-2">
-                                            <h6 class="mb-0"><strong>Lunch meeting</strong></h6><span class="text-xs">11:30 AM</span>
-                                        </div>
-                                        <div class="col-auto">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-2"></label></div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="list-group-item">
-                                    <div class="row align-items-center no-gutters">
-                                        <div class="col me-2">
-                                            <h6 class="mb-0"><strong>Lunch meeting</strong></h6><span class="text-xs">12:30 AM</span>
-                                        </div>
-                                        <div class="col-auto">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-3"></label></div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
                         </div>
                     </div>
                     <div class="col">
                         <div class="row">
-                            <div class="col-lg-6 mb-4">
-                                <div class="card textwhite bg-primary text-white shadow">
-                                    <div class="card-body">
-                                        <p class="m-0">Primary</p>
-                                        <p class="text-white-50 small m-0">#4e73df</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 mb-4">
-                                <div class="card textwhite bg-success text-white shadow">
-                                    <div class="card-body">
-                                        <p class="m-0">Success</p>
-                                        <p class="text-white-50 small m-0">#1cc88a</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 mb-4">
-                                <div class="card textwhite bg-info text-white shadow">
-                                    <div class="card-body">
-                                        <p class="m-0">Info</p>
-                                        <p class="text-white-50 small m-0">#36b9cc</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 mb-4">
-                                <div class="card textwhite bg-warning text-white shadow">
-                                    <div class="card-body">
-                                        <p class="m-0">Warning</p>
-                                        <p class="text-white-50 small m-0">#f6c23e</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 mb-4">
-                                <div class="card textwhite bg-danger text-white shadow">
-                                    <div class="card-body">
-                                        <p class="m-0">Danger</p>
-                                        <p class="text-white-50 small m-0">#e74a3b</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 mb-4">
-                                <div class="card textwhite bg-secondary text-white shadow">
-                                    <div class="card-body">
-                                        <p class="m-0">Secondary</p>
-                                        <p class="text-white-50 small m-0">#858796</p>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
