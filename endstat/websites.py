@@ -1,8 +1,8 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, url_for, current_app
 )
-import validators, json, time, pytz
-from datetime import datetime, timezone
+import validators, json
+from datetime import datetime
 from werkzeug.exceptions import abort
 
 # App imports
@@ -33,7 +33,7 @@ def websiteList():
             elif db.execute('SELECT EXISTS(SELECT 1 FROM websites WHERE user_id = ? AND domain = ?)', (g.user['id'], domain)).fetchone()[0]:
                 error = "This website already exists."
             elif db.execute('SELECT Count(id) FROM websites WHERE user_id = ?', (g.user['id'],)).fetchone()[0] == 5:
-                error = "You have reached your 5 website limit. Either delete some websites or upgrade your account to premium."
+                error = "You have reached your 5 website limit. Either delete some websites or upgrade by using the donate link under your profile button."
 
             if error is None:
                 db.execute(
@@ -47,6 +47,7 @@ def websiteList():
                 websiteScanner(websiteId, domain, g.user['id'])
                 return redirect(url_for('websites.websiteList'))
 
+        # Remove all instances of website from database
         elif request.form["btn"] == "deleteWebsite":
             websiteId = request.form['websiteId']
             db.execute('DELETE FROM websites WHERE id = ? AND user_id = ?', (websiteId, g.user['id']))
@@ -58,6 +59,7 @@ def websiteList():
             schedRemoveJob(websiteId)
             return redirect(url_for('websites.websiteList'))
         
+    # Get data for user's websites
     websitesDB = db.execute('SELECT domain, id FROM websites WHERE user_id = ?', (g.user['id'],)).fetchall()
     for row in websitesDB:
         domain, id = row
@@ -81,16 +83,10 @@ def viewWebsite(websiteId):
         # Get latest website scan results
         websitesDB = db.execute('SELECT datetime(date_time), status, general, ssl, safety, ports FROM website_log WHERE id = (SELECT MAX(id) FROM website_log WHERE website_id = ?)', 
             (int(websiteId),)).fetchone()
-
-        # Map and convert row data into dictionaries/strings
-        domain = db.execute('SELECT domain FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
-        dateTime = convertToUserTime(websitesDB[0], g.user['id'])
+        
+        # Try to load data in, if data is not yet ready show an error.
         try:
-            status = websitesDB[1]
-            general = json.loads(websitesDB[2])
-            ssl = json.loads(websitesDB[3])
-            safety = json.loads(websitesDB[4])
-            ports = json.loads(websitesDB[5])
+            websiteDict = loadScanResults(websitesDB, websiteId)
         except TypeError as e:
             print(f"{e}: Error found at viewWebsite() in websites.py")
             return render_template('error/general.html', 
@@ -99,7 +95,7 @@ def viewWebsite(websiteId):
                     If this is the first scan, please wait for around 5 seconds then try again.
                     Otherwise, send an email to 'endstat@mickit.net' to let us know.
                     """)
-        return render_template('websites/website.html', domain=domain, dateTime=dateTime, status=status, general=general, ssl=ssl, safety=safety, ports=ports) 
+        return render_template('websites/website.html', websiteDict=websiteDict) 
     else:
         abort(403)
 
@@ -108,3 +104,17 @@ def viewWebsite(websiteId):
 @login_required
 def websiteSettings(websiteId):
     db = get_db()
+
+def loadScanResults(websiteLog, websiteId):
+    db = get_db()
+    scanResults = {}
+    # Map and convert row data into dictionaries/strings
+    scanResults['domain'] = db.execute('SELECT domain FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
+    scanResults['dateTime'] = convertToUserTime(websiteLog[0], g.user['id'])
+    scanResults['websiteId'] = websiteId
+    scanResults['status'] = websiteLog[1]
+    scanResults['general'] = json.loads(websiteLog[2])
+    scanResults['ssl'] = json.loads(websiteLog[3])
+    scanResults['safety'] = json.loads(websiteLog[4])
+    scanResults['ports'] = json.loads(websiteLog[5])
+    return scanResults
