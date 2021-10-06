@@ -12,11 +12,17 @@ def sendEmail(recipient, message, api):
 	msg['From'] = formataddr((str(Header("End Stat", 'utf-8')), "endstat@mickit.net"))
 	msg['To'] = recipient
 
-	server = smtplib.SMTP_SSL('smtp.zoho.com.au', 465)
-	server.login('endstat@mickit.net', api)
-	server.sendmail("endstat@mickit.net", [recipient], msg.as_string())
-	server.quit()
-
+	try:
+		server = smtplib.SMTP_SSL('smtp.zoho.com.au', 465)
+		server.login('endstat@mickit.net', api)
+		server.sendmail("endstat@mickit.net", [recipient], msg.as_string())
+		server.quit()
+	except smtplib.SMTPServerDisconnected:
+		print("SMTP error.")
+		pass
+	except:
+		print("Socket timeout error.")
+		pass
 
 # General wrapper to send notifications to enabled agents for the user
 def sendNotification(userID, message, api=None):

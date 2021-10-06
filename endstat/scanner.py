@@ -57,10 +57,10 @@ def portScan(domain, userId):
 # Thread to run the scan
 def urlScanIOThread(uuid, logId, userId):
     # Once a scan has been initiated, we wait 5 seconds for urlscan.io to have a result ready,
-    # after that we poll every 2 seconds until we get a result. Timeout at one minute.
+    # after that we poll every 2 seconds until we get a result. Timeout at 40 seconds.
     time.sleep(5)
     db = sqlite3.connect('instance/endstat.sqlite')
-    retries = 15
+    retries = 20
     result = requests.get(f"https://urlscan.io/api/v1/result/{uuid}/")
     while result.status_code != 200:
         time.sleep(2)
@@ -125,7 +125,7 @@ def urlScanIO(domain, logId, userId, api=None):
     except KeyError as e:
         print(e)
 
-# Add all results to dict and return
+# Main function to scan a website and add results to database
 def websiteScanner(websiteId, domain, userId, apis=None):
     db = sqlite3.connect('instance/endstat.sqlite')
     # Make a new website log entry
@@ -143,10 +143,9 @@ def websiteScanner(websiteId, domain, userId, apis=None):
 
     # Run the url and port scanners
     urlScanIO(domain, logId, userId, urlApi)
-    # Wait some time for urlscan.io to process the request.
-    time.sleep(2)
     openPorts = portScan(domain, userId)
-
+    # Wait some time for scans to finish.
+    time.sleep(12)
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
     db.commit()
     db.close()
