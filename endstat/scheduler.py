@@ -3,6 +3,7 @@ from datetime import datetime
 from threading import Thread
 from time import sleep
 from flask import current_app
+
 # App imports
 from endstat.db import get_db
 from endstat.scanner import websiteScanner

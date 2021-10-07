@@ -3,6 +3,7 @@ from flask import (
 )
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
+import sqlite3
 
 # App imports
 from endstat.auth import login_required
@@ -139,10 +140,11 @@ def alerts():
 
 # Add an alert for specified user
 def addAlert(userId, type, alert):
-    db = get_db()
+    db = sqlite3.connect('instance/endstat.sqlite')
     db.execute('INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
             (datetime.utcnow(), type, alert, 0, userId))
     db.commit()
+    db.close()
     
 # Convert alert type to respective icon
 def getAlertIcon(type):
