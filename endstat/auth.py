@@ -84,7 +84,7 @@ def login():
             else:
                 session.clear()
                 session['user_id'] = user['id']
-                return redirect(url_for('main.websites'))
+                return redirect(url_for('websites.websiteList'))
            
     return render_template('auth/login.html', error=error)
 
@@ -103,7 +103,7 @@ def totp(userId):
             if (pyotp.TOTP(secret).verify(totp)):
                 session.clear()
                 session['user_id'] = userId
-                return redirect(url_for('main.websites'))
+                return redirect(url_for('websites.websiteList'))
             error = "Invalid code supplied, try again."
 
     return render_template('auth/totp.html', error=error)
