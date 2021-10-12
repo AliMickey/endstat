@@ -1,7 +1,7 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, session, url_for
 )
-import functools, uuid, validators
+import functools, uuid, validators, pyotp
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -79,11 +79,34 @@ def login():
             error = 'Incorrect email or password. Please try again.'
 
         if error is None:
-            session.clear()
-            session['user_id'] = user['id']
-            return redirect(url_for('main.dashboard'))
-
+            if user['totp']:
+                return redirect(url_for('auth.totp', userId=user['id']))
+            else:
+                session.clear()
+                session['user_id'] = user['id']
+                return redirect(url_for('main.websites'))
+           
     return render_template('auth/login.html', error=error)
+
+# View to confirm user's multi-factor authentication
+@bp.route('/totp/<int:userId>', methods=('GET', 'POST'))
+def totp(userId):
+    error = None
+    if request.method == 'POST':
+        totp = request.form.get('totp')
+        if not totp:
+            error = "You need to supply a code from your authentication app."
+
+        if error is None:
+            db = get_db()
+            secret = db.execute('SELECT totp FROM users WHERE id = ?', (userId,)).fetchone()[0]
+            if (pyotp.TOTP(secret).verify(totp)):
+                session.clear()
+                session['user_id'] = userId
+                return redirect(url_for('main.websites'))
+            error = "Invalid code supplied, try again."
+
+    return render_template('auth/totp.html', error=error)
 
 # View to request a new password link
 @bp.route('/forgot-password', methods=('GET', 'POST'))

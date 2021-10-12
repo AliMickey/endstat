@@ -3,7 +3,7 @@ from flask import (
 )
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
-import sqlite3
+import sqlite3, pyotp
 
 # App imports
 from endstat.auth import login_required
@@ -102,21 +102,31 @@ def settings():
 
         elif request.form["btn"] == "deleteUser":
             # Remove all db entries related to the user
-            userId = g.user['id']
-            db.execute('DELETE FROM users WHERE id = ?', (userId,))
+            db.execute('DELETE FROM users WHERE id = ?', (g.user['id'],))
             db.commit()
-            websiteDB = db.execute("SELECT id FROM websites WHERE user_id = ?", (userId,)).fetchall()
+            websiteDB = db.execute("SELECT id FROM websites WHERE user_id = ?", (g.user['id'],)).fetchall()
             for website in websiteDB:
                 db.execute('DELETE FROM website_log WHERE website_id = ?', (website[0],))
-            db.execute('DELETE FROM websites WHERE user_id = ?', (userId,))
+            db.execute('DELETE FROM websites WHERE user_id = ?', (g.user['id'],))
             db.commit()
-            db.execute('DELETE FROM user_alerts WHERE user_id = ?', (userId,))
+            db.execute('DELETE FROM user_alerts WHERE user_id = ?', (g.user['id'],))
             db.commit()
-            db.execute('DELETE FROM notification_settings WHERE user_id = ?', (userId,))
+            db.execute('DELETE FROM notification_settings WHERE user_id = ?', (g.user['id'],))
             db.commit()
-            db.execute('DELETE FROM reset_pass WHERE user_id = ?', (userId,))
+            db.execute('DELETE FROM reset_pass WHERE user_id = ?', (g.user['id'],))
             session.clear()
             return redirect(url_for('main.index'))
+
+        elif request.form["btn"] == "totp":
+            userTotp = db.execute('SELECT totp FROM users WHERE id = ?', (g.user['id'],)).fetchone()[0]
+            if userTotp:
+                errorPass = "You already have multi-factor authentication setup."
+            else:
+                base32 = pyotp.random_base32()
+                db.execute('UPDATE users SET totp = ? WHERE id = ?', (base32, g.user['id']))
+                db.commit()
+                errorPass = f"Your secret key is: '{base32}'. Add it to your authenticator app, you will not see this key again."
+
     return render_template('profile/profile-settings.html', errorUser=errorUser, errorPass=errorPass, errorNotif=errorNotif, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], currentTZone=userDetails['time_zone'], notifDetails=notifDetails)
 
 # View for user alerts

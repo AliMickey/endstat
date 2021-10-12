@@ -10,7 +10,8 @@ CREATE TABLE users (
   first_name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
-  time_zone TEXT NOT NULL
+  time_zone TEXT NOT NULL,
+  totp TEXT
 );
 
 CREATE TABLE user_alerts (
