@@ -94,7 +94,7 @@ def viewWebsite(websiteId):
                     There was an error with loading the website scan results.
                     If this is the first scan, please wait for around 5 seconds then try again.
                     Otherwise, send an email to 'endstat@mickit.net' to let us know.
-                    """)
+                    """, dash="0")
         return render_template('websites/website.html', websiteDict=websiteDict) 
     else:
         abort(403)

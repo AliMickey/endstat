@@ -32,6 +32,9 @@ def dashboard():
     # Get all websits for user
     userWebsitesDb = db.execute('SELECT id, domain FROM websites WHERE user_id = ?', (g.user['id'],)).fetchall()
     websiteUsage = len(userWebsitesDb)
+    if websiteUsage == 0:
+        return render_template('error/general.html', error="You do not seem to have any websites added, come back here once you have.")
+
     for website in userWebsitesDb:
         # Get past 5 logs for website
         websiteLogs = db.execute('SELECT datetime(date_time), status, general, ssl, safety, ports from website_log WHERE website_id = ? ORDER BY datetime(date_time) DESC Limit 5', (website[0],)).fetchall()
@@ -47,6 +50,9 @@ def dashboard():
             else:
                 latestScan[0] = log
                 latestScan[1] = website[0]
+
+            if log['ssl'] is None:
+                return render_template('error/general.html', error="Your dashboard is not quite ready yet, come back after a scan has been completed.")
 
             # Get soonest cert expiry of all logs
             ssl = json.loads(log['ssl']) 
@@ -64,15 +70,15 @@ def dashboard():
             totalSecurityRating += int(safety['securePercentage'])
             totalSecurityCounter += 1
 
-    # Sort previous 4 scans and pass as dict
-    sortedPreviousScans = sorted(previousScans, key=lambda t: datetime.strptime(t[0][0], '%Y-%m-%d %H:%M:%S'))
-    next4Scans = []
-    for log in sortedPreviousScans:
-        next4Scans.append(loadScanResults(log[0], log[1]))
-    next4Scans.reverse()
+        # Sort previous 4 scans and pass as dict
+        sortedPreviousScans = sorted(previousScans, key=lambda t: datetime.strptime(t[0][0], '%Y-%m-%d %H:%M:%S'))
+        next4Scans = []
+        for log in sortedPreviousScans:
+            next4Scans.append(loadScanResults(log[0], log[1]))
+        next4Scans.reverse()
 
-    # Get average security rating
-    averageRatingPercentage = int(totalSecurityRating/totalSecurityCounter)  
+        # Get average security rating
+        averageRatingPercentage = int(totalSecurityRating/totalSecurityCounter)  
 
     return render_template('main/dashboard.html', latestScan=loadScanResults(latestScan[0], latestScan[1]), averageRatingPercentage=averageRatingPercentage, soonestExpiry=soonestExpiry, websiteUsage=websiteUsage, next4Scans=next4Scans[:4])
 
