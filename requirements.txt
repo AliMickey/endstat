@@ -6,3 +6,4 @@ validators
 schedule
 pytz
 pyotp
+flask_qrcode
