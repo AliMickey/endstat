@@ -58,11 +58,27 @@
                                             <div class="mb-3"><button class="btn btn-primary btn-sm" type="submit" name="btn" value="password">Update Password</button></div>
                                         </form>
                                         <form method="post">
-                                            <div class="mb-3"><button class="btn btn-primary btn-sm" type="submit" name="btn" value="totp">Enable Multi-Factor Authentication</button></div>
+                                            <div class="mb-3">
+                                                {% set class = "primary" %}
+                                                {% set text = "Enable" %}
+                                                {% if totpEnabled %}
+                                                    {% set class = "danger" %}
+                                                    {% set text = "Disable" %}
+                                                {% endif %}       
+                                                <button class="btn btn-{{ class }} btn-sm" type="submit" name="btn" value="totp">{{ text }} Multi-Factor Authentication</button>
+                                            </div>
                                         </form>
                                         {% if errorPass %}
                                             <div class="text-center">
                                                 <p class="text-dark mb-4">{{ errorPass }}</p>
+                                            </div>
+                                        {% endif %}
+                                        {% if totpCode %}
+                                            <div class="text-center">
+                                                <p class="text-dark mb-4">Use the QR code or secret key to add this account to your authenticator app. You will not see this key/qr code again.</p>
+                                                <p class="text-dark mb-4">Do NOT refresh this page using your browser reload button. It will remove multi-factor authentication from your account. Use the menu button instead.</p>
+                                                <img src="{{ qrcode(qrString) }}">
+                                                <p>{{totpCode}}</p>
                                             </div>
                                         {% endif %}
                                     </div>

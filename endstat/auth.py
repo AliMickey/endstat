@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, g, redirect, render_template, request, session, url_for
+    Blueprint, g, redirect, render_template, request, session, url_for, current_app
 )
 import functools, uuid, validators, pyotp
 from datetime import datetime
@@ -167,7 +167,7 @@ def resetPassword(resetKey):
                     'UPDATE reset_pass SET activated = 1 WHERE reset_key = ?',
                     (resetKey,))
                 db.commit() 
-                sendEmail(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id'],)).fetchone()[0], "Letting you know that your password was reset.")
+                sendEmail(db.execute('SELECT email FROM users WHERE id = ?', (resetPassDetails['user_id'],)).fetchone()[0], "Letting you know that your password was reset.", current_app.config['ZOHO_API'])
                 session.clear()
                 return redirect(url_for('auth.login'))
     

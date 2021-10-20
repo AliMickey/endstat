@@ -1,9 +1,9 @@
 from flask import (
-    Blueprint, g, redirect, render_template, request, session, url_for
+    Blueprint, g, redirect, render_template, request, session, url_for, current_app
 )
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
-import sqlite3, pyotp
+import sqlite3, pyotp, qrcode
 
 # App imports
 from endstat.auth import login_required
@@ -12,6 +12,7 @@ from endstat.notifications import sendNotification
 from endstat.shared import convertToUserTime
 
 bp = Blueprint('profile', __name__, url_prefix='/profile')
+#QRcode(current_app)
 
 @bp.route('/', methods=('GET', 'POST'))
 @login_required
@@ -20,10 +21,14 @@ def settings():
     errorUser = None
     errorPass = None
     errorNotif = None
+    base32 = None
+    qrString = None
+    totpEnabled = False
     db = get_db()  
-    userDetails = db.execute('SELECT first_name, password, email, time_zone FROM users WHERE id = ?', (g.user['id'],)).fetchone()
+    userDetails = db.execute('SELECT first_name, password, email, time_zone, totp FROM users WHERE id = ?', (g.user['id'],)).fetchone()
     notifDetails = db.execute('SELECT email, discord, email_enabled, discord_enabled FROM notification_settings WHERE user_id = ?', 
         (g.user['id'],)).fetchone()
+    if userDetails['totp']: totpEnabled = True
 
     if request.method == 'POST':
         if request.form["btn"] == "user":
@@ -118,16 +123,18 @@ def settings():
             return redirect(url_for('main.index'))
 
         elif request.form["btn"] == "totp":
-            userTotp = db.execute('SELECT totp FROM users WHERE id = ?', (g.user['id'],)).fetchone()[0]
-            if userTotp:
-                errorPass = "You already have multi-factor authentication setup."
+            user = db.execute('SELECT totp, email FROM users WHERE id = ?', (g.user['id'],)).fetchone()
+            if user[0]:
+                db.execute('UPDATE users SET totp = ? WHERE id = ?', (None, g.user['id']))
+                db.commit()
+                errorPass = "Multi-Factor authentication removed."
             else:
                 base32 = pyotp.random_base32()
                 db.execute('UPDATE users SET totp = ? WHERE id = ?', (base32, g.user['id']))
                 db.commit()
-                errorPass = f"Your secret key is: '{base32}'. Add it to your authenticator app, you will not see this key again."
+                qrString = f"otpauth://totp/{user[1]}?secret={base32}&issuer=Endstat"
 
-    return render_template('profile/profile-settings.html', errorUser=errorUser, errorPass=errorPass, errorNotif=errorNotif, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], currentTZone=userDetails['time_zone'], notifDetails=notifDetails)
+    return render_template('profile/profile-settings.html', errorUser=errorUser, errorPass=errorPass, errorNotif=errorNotif, currentFName=userDetails['first_name'], currentEmail=userDetails['email'], currentTZone=userDetails['time_zone'], notifDetails=notifDetails, qrString=qrString, totpCode=base32, totpEnabled=totpEnabled)
 
 # View for user alerts
 @bp.route('/alerts', methods=('GET', 'POST'))

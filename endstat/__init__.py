@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_qrcode import QRcode
 
 def create_app(test_config=None):
     # create and configure the app
@@ -36,5 +37,7 @@ def create_app(test_config=None):
 
     from . import scheduler
     app.before_first_request(scheduler.schedInitJobs)
+
+    QRcode(app)
     
     return app
