@@ -61,7 +61,7 @@ def register():
                 'INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
                     (datetime.utcnow(), "primary", "Welcome to End Stat, we hope you enjoy it!", 0, userID))
             db.commit()
-            #TEMPDISABLE sendNotification(userID, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you haven't already!")
+            sendEmail(userID, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you haven't already!", current_app.config['ZOHO_API'])
             return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', error=error)
@@ -132,7 +132,7 @@ def forgotPassword():
                 db.execute('INSERT INTO reset_pass (reset_key, user_id, date_time, activated) VALUES (?, ?, ?, ?) ', 
                     (str(resetKey), userID, datetime.now(), False))
                 db.commit()
-            sendEmail(email, f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}")
+            sendEmail(email, f"Use the following link to reset your password for EndStat. https://endstat.com/auth/reset-password/{resetKey}", current_app.config['ZOHO_API'])
         error = "If your email exists in our system, you will receive an email soon with instructions. Check your spam if you do not see it."
 
     return render_template('auth/forgot-password.html', error=error)
