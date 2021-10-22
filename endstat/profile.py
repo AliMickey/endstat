@@ -1,18 +1,16 @@
 from flask import (
-    Blueprint, g, redirect, render_template, request, session, url_for, current_app
+    Blueprint, g, redirect, render_template, request, session, url_for
 )
-from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
-import sqlite3, pyotp, qrcode
+import pyotp
 
 # App imports
 from endstat.auth import login_required
 from endstat.db import get_db
 from endstat.notifications import sendNotification
-from endstat.shared import convertToUserTime
+from endstat.shared import convertToUserTime, getAlertIcon
 
 bp = Blueprint('profile', __name__, url_prefix='/profile')
-#QRcode(current_app)
 
 @bp.route('/', methods=('GET', 'POST'))
 @login_required
@@ -31,6 +29,7 @@ def settings():
     if userDetails['totp']: totpEnabled = True
 
     if request.method == 'POST':
+        # If user form is submitted
         if request.form["btn"] == "user":
             first_name = request.form['first_name']
             email = request.form['email']
@@ -57,6 +56,7 @@ def settings():
                     db.commit()
                 return redirect(url_for('profile.settings'))
 
+        # If password form is submitted
         elif request.form["btn"] == "password":
             current_password = request.form['current_password']
             password = request.form['password']
@@ -78,6 +78,7 @@ def settings():
                 session.clear()
                 return redirect(url_for('auth.login'))
 
+        # If notification form is submitted
         elif request.form["btn"] == "notif":
             chkEmail = request.form.get('chkEmail')
             chkDiscord = request.form.get('chkDiscord')
@@ -105,6 +106,7 @@ def settings():
                 db.commit()
             return redirect(url_for('profile.settings'))
 
+        # If delete user form is submitted
         elif request.form["btn"] == "deleteUser":
             # Remove all db entries related to the user
             db.execute('DELETE FROM users WHERE id = ?', (g.user['id'],))
@@ -122,6 +124,7 @@ def settings():
             session.clear()
             return redirect(url_for('main.index'))
 
+        # If totp form is submitted
         elif request.form["btn"] == "totp":
             user = db.execute('SELECT totp, email FROM users WHERE id = ?', (g.user['id'],)).fetchone()
             if user[0]:
@@ -154,17 +157,3 @@ def alerts():
         db.execute('UPDATE user_alerts SET read = 1 WHERE id = ?', (request.form['read'],))
         db.commit()
     return render_template('profile/alerts.html', error=error, alerts=alertsDict)
-
-# Add an alert for specified user
-def addAlert(userId, type, alert):
-    db = sqlite3.connect('instance/endstat.sqlite')
-    db.execute('INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
-            (datetime.utcnow(), type, alert, 0, userId))
-    db.commit()
-    db.close()
-    
-# Convert alert type to respective icon
-def getAlertIcon(type):
-    if (type == "primary"): return "check"
-    elif (type == "warning"): return "asterisk"
-    elif (type == "danger"): return "exclamation-triangle"

@@ -1,17 +1,16 @@
 from flask import (
-    Blueprint, g, redirect, render_template, request, url_for, current_app
+    Blueprint, g, redirect, render_template, request, url_for
 )
-import validators, json
+import validators
 from datetime import datetime
 from werkzeug.exceptions import abort
 
 # App imports
 from endstat.auth import login_required, checkWebsiteAuthentication
 from endstat.db import get_db
-from endstat.notifications import sendNotification
 from endstat.scanner import websiteScanner
 from endstat.scheduler import schedAddJob, schedRemoveJob
-from endstat.shared import convertToUserTime
+from endstat.shared import convertToUserTime, loadScanResults
 
 bp = Blueprint('websites', __name__, url_prefix='/websites')
 
@@ -98,23 +97,3 @@ def viewWebsite(websiteId):
         return render_template('websites/website.html', websiteDict=websiteDict) 
     else:
         abort(403)
-
-# View for managing website specific settings
-@bp.route('/settings/<int:websiteId>')
-@login_required
-def websiteSettings(websiteId):
-    db = get_db()
-
-def loadScanResults(websiteLog, websiteId):
-    db = get_db()
-    scanResults = {}
-    # Map and convert row data into dictionaries/strings
-    scanResults['domain'] = db.execute('SELECT domain FROM websites WHERE id = ?', (websiteId,)).fetchone()[0]
-    scanResults['dateTime'] = convertToUserTime(websiteLog[0], g.user['id'])
-    scanResults['websiteId'] = websiteId
-    scanResults['status'] = websiteLog[1]
-    scanResults['general'] = json.loads(websiteLog[2])
-    scanResults['ssl'] = json.loads(websiteLog[3])
-    scanResults['safety'] = json.loads(websiteLog[4])
-    scanResults['ports'] = json.loads(websiteLog[5])
-    return scanResults

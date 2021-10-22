@@ -4,6 +4,8 @@ from discord_webhook import DiscordWebhook
 from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 # Specific email agent
 def sendEmail(recipient, message, api):
@@ -17,11 +19,8 @@ def sendEmail(recipient, message, api):
 		server.login('endstat@mickit.net', api)
 		server.sendmail("endstat@mickit.net", [recipient], msg.as_string())
 		server.quit()
-	except smtplib.SMTPServerDisconnected:
-		print("SMTP error.")
-		pass
-	except:
-		print("Socket timeout error.")
+	except Exception as e:
+		print(f"Exception when sending email: {e}")
 		pass
 
 # General wrapper to send notifications to enabled agents for the user

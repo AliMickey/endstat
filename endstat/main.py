@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, g, redirect, render_template, request, url_for
+    Blueprint, g, render_template
 )
 from datetime import datetime
 import json
@@ -8,7 +8,7 @@ import json
 from endstat.auth import login_required
 from endstat.db import get_db
 from endstat.profile import getAlertIcon
-from endstat.websites import loadScanResults
+from endstat.shared import loadScanResults, getAlertIcon
 
 bp = Blueprint('main', __name__)
 

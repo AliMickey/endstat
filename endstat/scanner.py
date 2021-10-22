@@ -1,16 +1,13 @@
-from io import DEFAULT_BUFFER_SIZE
 from flask import current_app
 import socket, threading, json, requests, time, sqlite3, re
-from flask.typing import URLValuePreprocessorCallable
 from datetime import datetime
 from queue import Queue
 from threading import Thread
 from urllib.request import socket
-from requests.api import get
 
 #App imports
 from endstat.notifications import sendNotification
-from endstat.profile import addAlert
+from endstat.shared import addAlert
 
 print_lock = threading.Lock()
 socket.setdefaulttimeout(0.2)
@@ -24,7 +21,7 @@ def portScanThread(ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try: 
         result = sock.connect_ex((ip, port))
-        sock.settimeout(None) #test with 0.2
+        sock.settimeout(0.2)
         if result == 0:
             return port
         sock.close()
@@ -144,7 +141,7 @@ def websiteScanner(websiteId, domain, userId, apis=None):
     # Run the url and port scanners
     urlScanIO(domain, logId, userId, urlApi)
     openPorts = portScan(domain, userId)
-    # Wait some time for scans to finish.
+    # Wait some time for scans to finish while giving user scanning animation.
     time.sleep(12)
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
     db.commit()

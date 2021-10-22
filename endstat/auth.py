@@ -61,7 +61,7 @@ def register():
                 'INSERT INTO user_alerts (date_time, type, message, read, user_id) VALUES (?, ?, ?, ?, ?)', 
                     (datetime.utcnow(), "primary", "Welcome to End Stat, we hope you enjoy it!", 0, userID))
             db.commit()
-            sendEmail(userID, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you haven't already!", current_app.config['ZOHO_API'])
+            sendEmail(email, "Thanks for trying out End Stat, this is an email to confirm that your account has been created. Head over to https://endstat.com if you haven't already!", current_app.config['ZOHO_API'])
             return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', error=error)
