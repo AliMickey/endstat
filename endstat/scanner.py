@@ -12,9 +12,9 @@ from endstat.shared import addAlert
 print_lock = threading.Lock()
 socket.setdefaulttimeout(0.2)
 
-scanPorts = { 20: ['ftp', 'warn'], 21: ['ftp', 'warn'], 22: ['ssh', 'danger'], 23: ['telnet', 'warn'], 25: ['smtp', 'warn'], 80: ['http', 'safe'], 
-    110: ['pop', 'warn'], 139: ['smb', 'danger'], 443: ['https', 'safe'], 445: ['smb', 'danger'], 1433: ['MSSQL', 'danger'], 
-    1521: ['Oracle DB', 'danger'], 3306: ['MySQL', 'danger'], 3389: ['RDP', 'danger'] }
+scanPorts = { 20: ['ftp', 'warn'], 21: ['ftp', 'warn'], 22: ['ssh', 'danger'], 23: ['telnet', 'warn'], 25: ['smtp', 'warn'], 53: ['dns', 'danger'], 80: ['http', 'safe'], 
+    110: ['pop', 'warn'], 139: ['NetBIOS', 'danger'], 443: ['https', 'safe'], 445: ['smb', 'danger'], 853: ['DoT', 'safe'], 1433: ['MSSQL', 'danger'], 
+    1521: ['Oracle DB', 'danger'], 3306: ['MySQL', 'danger'], 3389: ['RDP', 'danger'], 32400: ['Plex', 'safe'] }
 
 # Open port scanner
 def portScanThread(ip, port):
