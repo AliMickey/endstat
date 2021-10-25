@@ -8,6 +8,7 @@ import json
 from endstat.auth import login_required
 from endstat.db import get_db
 from endstat.profile import getAlertIcon
+from endstat.scheduler import getNextScan
 from endstat.shared import loadScanResults, getAlertIcon
 
 bp = Blueprint('main', __name__)
@@ -80,7 +81,19 @@ def dashboard():
         # Get average security rating
         averageRatingPercentage = int(totalSecurityRating/totalSecurityCounter)  
 
-    return render_template('main/dashboard.html', latestScan=loadScanResults(latestScan[0], latestScan[1]), averageRatingPercentage=averageRatingPercentage, soonestExpiry=soonestExpiry, websiteUsage=websiteUsage, next4Scans=next4Scans[:4])
+        # Get and convert next scan from seconds into appropiate time
+        nextScan = int((getNextScan() - datetime.utcnow()).seconds)
+
+        if nextScan < 60:
+            nextScan = "Soon"
+        elif nextScan >= 60 and nextScan <= 3600:
+            nextScan = f"{round(nextScan/60)} Minutes"
+        elif nextScan > 3600 and nextScan < 86400:
+            nextScan = f"{round(nextScan/60/60)} Hours"
+        else:
+            nextScan = "Unknown"
+
+    return render_template('main/dashboard.html', latestScan=loadScanResults(latestScan[0], latestScan[1]), averageRatingPercentage=averageRatingPercentage, soonestExpiry=soonestExpiry, websiteUsage=websiteUsage, next4Scans=next4Scans[:4], nextScan=nextScan)
 
 # View for privacy policy
 @bp.route('/privacy-policy')

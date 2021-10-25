@@ -17,6 +17,7 @@ def schedInitJobs():
     for row in websitesDB:
         id, domain, scanTime, userId = row
         schedAddJob(id, domain, scanTime, userId)
+    # Run main background schedule process
     thread = Thread(target=schedPendingRunner)
     thread.start()
 
@@ -34,6 +35,9 @@ def schedAddJob(websiteId, domain, dateTime, userId):
 def schedRemoveJob(websiteId):
     # Remove the scheduled job for the given website by tag
     schedule.clear(websiteId)
+
+def getNextScan():
+    return schedule.next_run()
 
 # Runs all pending schedule jobs - runs every minute
 def schedPendingRunner():
