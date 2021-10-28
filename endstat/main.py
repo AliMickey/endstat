@@ -82,7 +82,10 @@ def dashboard():
         averageRatingPercentage = int(totalSecurityRating/totalSecurityCounter)  
 
         # Get and convert next scan from seconds into appropiate time
-        nextScan = int((getNextScan() - datetime.utcnow()).seconds)
+        nextScanTime = getNextScan()
+        if nextScanTime:
+            nextScan = int((nextScanTime - datetime.utcnow()).seconds)
+        else: nextScan = None
 
         if nextScan < 60:
             nextScan = "Soon"
