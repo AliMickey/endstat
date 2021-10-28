@@ -95,11 +95,11 @@ def urlScanIOThread(uuid, logId, userId):
     safetyDict = {'malicious': malicious, 'securePercentage': securePercentage, 'verdicts': verdicts}
 
     if sslStatus != "secure" or sslExpiryDaysLeft < 7 or malicious is True:
-        status = "Critical"
+        db.execute('UPDATE website_log SET status = ? WHERE id = ?', ("Critical", logId))
+        db.commit()
         addAlert(userId, "danger", f"A recent scan has resulted in a critical result.")
-    else: status = "Normal" 
 
-    db.execute('UPDATE website_log SET status = ?,general = ?,ssl = ?,safety = ?  WHERE id = ?', (status, json.dumps(generalDict), json.dumps(sslDict), json.dumps(safetyDict), logId))
+    db.execute('UPDATE website_log SET general = ?,ssl = ?,safety = ?  WHERE id = ?', (json.dumps(generalDict), json.dumps(sslDict), json.dumps(safetyDict), logId))
     db.commit()
     db.close()
 
@@ -141,6 +141,12 @@ def websiteScanner(websiteId, domain, userId, apis=None):
     # Run the url and port scanners
     urlScanIO(domain, logId, userId, urlApi)
     openPorts = portScan(domain, userId)
+    for port in openPorts:
+        if 'danger' in port:
+            db.execute('UPDATE website_log SET status = ? WHERE id = ?', ('Critical', int(logId)))
+            db.commit()
+            break
+
     # Wait some time for scans to finish while giving user scanning animation.
     time.sleep(12)
     db.execute('UPDATE website_log SET ports = ? WHERE id = ?', (json.dumps(openPorts), int(logId)))
