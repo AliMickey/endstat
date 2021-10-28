@@ -126,7 +126,7 @@ def urlScanIO(domain, logId, userId, api=None):
 def websiteScanner(websiteId, domain, userId, apis=None):
     db = sqlite3.connect('instance/endstat.sqlite')
     # Make a new website log entry
-    db.execute('INSERT INTO website_log (date_time, website_id) VALUES (?, ?)', (datetime.utcnow(), websiteId))
+    db.execute('INSERT INTO website_log (date_time, website_id, status) VALUES (?, ?, ?)', (datetime.utcnow(), websiteId, "Normal"))
     db.commit()
     # Select the id of the newly made log entry
     logId = db.execute('SELECT id FROM website_log WHERE website_id = ? AND id = (SELECT MAX(id) FROM website_log)', (websiteId,)).fetchone()[0]
