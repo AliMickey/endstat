@@ -26,7 +26,7 @@ Pre-existing solutions were either not open-source, behind a paywall of some sor
 9. Run the app `flask run`
 
 ## Notes
-In order for website scanning to work, you need an api key from [URLScan.io](https://urlscan.io/docs/api)
+In order for website scanning to work, you need an api key from [URLScan.io](https://urlscan.io/docs/api).
 Furthermore, for emails to work, you will need to get a [Zoho](https://www.zoho.com) app password and change all domain references to your own.
 
 ## Features
