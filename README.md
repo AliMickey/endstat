@@ -3,7 +3,9 @@
 An Open-Source Platform to Facilitate Endpoint Status Monitoring.
 Developed for final year university project.
 
-[Live Version](https://endstat.app.mickit.net)
+https://endstat.app.mickit.net
+
+![image](https://user-images.githubusercontent.com/60691199/195441841-9156d778-c17f-460c-9c0a-676e9a27643a.png)
 
 ## Motivation
 Pre-existing solutions were either not open-source, behind a paywall of some sort or was not simple enough to use.
