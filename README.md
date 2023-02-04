@@ -3,7 +3,7 @@
 An Open-Source Platform to Facilitate Endpoint Status Monitoring.
 Developed for final year university project.
 
-https://endstat.app.mickit.net
+https://web.archive.org/web/20221211205822/https://endstat.app.mickit.net/
 
 ![image](https://user-images.githubusercontent.com/60691199/195441841-9156d778-c17f-460c-9c0a-676e9a27643a.png)
 
